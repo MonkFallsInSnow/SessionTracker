@@ -78,12 +78,11 @@
     <Compile Include="Modules\Commands\ReadCommands.cs" />
     <Compile Include="Modules\Data\Database.cs" />
     <Compile Include="Modules\Data\IDatabase.cs" />
-    <Compile Include="Modules\Data\IDataBaseInteraction.cs" />
     <Compile Include="Modules\Data\Invoker.cs" />
     <Compile Include="Modules\Data\Models\Campus.cs" />
     <Compile Include="Modules\Data\Models\SignInData.cs" />
     <Compile Include="Modules\Data\SignInDataSource.cs" />
-    <Compile Include="Modules\Messaging\ErrorMessage.cs" />
+    <Compile Include="Modules\Messaging\MessageHandler.cs" />
     <Compile Include="Modules\Messaging\IMessageHandler.cs" />
     <Compile Include="Modules\Requests\DataRequest.cs" />
     <Compile Include="Modules\Requests\IRequestHandler.cs" />
@@ -124,6 +123,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Modules\Data\SQL\create.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

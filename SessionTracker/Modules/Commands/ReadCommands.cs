@@ -1,21 +1,23 @@
 ﻿using SessionTracker.Modules.Data;
-using SessionTracker.Modules.Data.Models;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace SessionTracker.Modules.Commands
 {
-    public interface IDatabaseCommand
+    public interface IDatabaseCommand<T>
     {
-        object Execute();
+        T Execute();
     }
 
-    class GetCampusesCommand : IDatabaseCommand
+    public interface IDatabaseReadCommand : IDatabaseCommand<IList<object>>
+    {
+    }
+
+    public interface IDatabaseWriteCommand : IDatabaseCommand<int>
+    {
+    }
+
+    class GetCampusesCommand : IDatabaseReadCommand
     {
         private readonly IDatabase database;
 
@@ -24,7 +26,7 @@ namespace SessionTracker.Modules.Commands
             this.database = database;
         }
 
-        public object Execute()
+        public IList<object> Execute()
         {
             return this.database.GetCampuses();
         }

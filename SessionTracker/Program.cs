@@ -26,7 +26,6 @@ namespace SessionTracker
             IMessageHandler messageHandler = new MessageHandler();
 
             using (IDatabase database = new Database("database.sqlite", messageHandler))
-            using (database.Connection)
             {
                 database.Connection.Open();
 
