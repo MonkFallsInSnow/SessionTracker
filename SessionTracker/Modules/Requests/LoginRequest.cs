@@ -1,6 +1,4 @@
 ﻿using SessionTracker.Modules.Messaging;
-using SessionTracker.Modules.Requests;
-using SessionTracker.Utility;
 using System;
 using System.Collections.Specialized;
 using System.Net;

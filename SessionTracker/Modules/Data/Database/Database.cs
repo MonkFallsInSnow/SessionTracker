@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Data.SQLite;
 using System.Windows.Forms;
 
-namespace SessionTracker.Modules.Data
+namespace SessionTracker.Modules.Data.Database
 {
     class Database : IDatabase
     {
