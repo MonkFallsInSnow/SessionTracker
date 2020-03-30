@@ -6,10 +6,12 @@ using System.ComponentModel;
 using System.Data.SQLite;
 using System.Windows.Forms;
 
-namespace SessionTracker.Modules.Data
+namespace SessionTracker.Modules.Data.Database
 {
     class Database : IDatabase
     {
+        private static readonly string CreateStatementsLocation = @"../../Modules/Data/SQL/create.sql";
+
         private SQLiteConnection connection;
         private readonly string databaseName;
         private readonly IMessageHandler errorHandler;
@@ -20,9 +22,7 @@ namespace SessionTracker.Modules.Data
             {
                 if (this.connection == null)
                 {
-                    string dbPath = System.IO.Path.Combine(Environment.CurrentDirectory, databaseName);
-                    string connectionString = string.Format("Data Source={0}", dbPath);
-                    connection = new SQLiteConnection(connectionString);
+                    this.connection = this.CreateConnection();
                 }
 
                 return connection;
@@ -34,25 +34,43 @@ namespace SessionTracker.Modules.Data
         {
             this.databaseName = databaseName;
             this.errorHandler = errorHandler;
+            this.connection = this.CreateConnection();
 
-            if (!System.IO.File.Exists(databaseName))
+            if (System.IO.File.Exists(databaseName))
+            {
+                System.IO.FileStream dbFile = System.IO.File.OpenRead(databaseName);
+                
+                if(dbFile.Length == 0)
+                {
+                    dbFile.Dispose();
+                    this.CreateTables();
+                }
+            }
+            else
             {
                 SQLiteConnection.CreateFile(databaseName);
                 this.CreateTables();
             }
         }
 
+        private SQLiteConnection CreateConnection()
+        {
+            string dbPath = System.IO.Path.Combine(Environment.CurrentDirectory, databaseName);
+            string connectionString = string.Format("Data Source={0}", dbPath);
+            return new SQLiteConnection(connectionString);
+        }
+
         private void CreateTables()
         {
-            using (this.connection)
+            //using (this.connection)
             {
                 this.connection.Open();
 
                 try
                 {
-                    SQLiteCommand command = new SQLiteCommand(this.Connection)
+                    SQLiteCommand command = new SQLiteCommand(this.connection)
                     {
-                        CommandText = System.IO.File.ReadAllText(@"../../Data/SQL/createTables.sql")
+                        CommandText = System.IO.File.ReadAllText(CreateStatementsLocation)
                     };
 
                     command.ExecuteNonQuery();
@@ -67,7 +85,11 @@ namespace SessionTracker.Modules.Data
         public void Dispose()
         {
             if (this.connection != null)
+            {
                 this.connection.Dispose();
+            }
+
+            //this.Dispose();
         }
 
         public IList<object> GetCampuses()
@@ -82,11 +104,7 @@ namespace SessionTracker.Modules.Data
                 {
                     while (reader.Read())
                     {
-                        campuses.Add(new
-                        {
-                            ID = reader.GetInt32(0),
-                            Name = reader.GetString(1)
-                        });
+                        campuses.Add(new Campus(reader.GetInt32(0), reader.GetString(1)));
                     }
                 }
             }
