@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace SessionTracker.Modules.Data.Database
 {
@@ -7,7 +8,7 @@ namespace SessionTracker.Modules.Data.Database
         T Execute();
     }
 
-    public interface IDatabaseReadCommand : IDatabaseCommand<IList<object>>
+    public interface IDatabaseReadCommand : IDatabaseCommand<IEnumerable<NameValueCollection>>
     {
     }
 

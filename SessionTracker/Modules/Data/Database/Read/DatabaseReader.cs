@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace SessionTracker.Modules.Data.Database
 {
-    class DatabaseReader : IInvoker<IDatabaseReadCommand, IList<object>>
+    class DatabaseReader : IInvoker<IDatabaseReadCommand, IEnumerable<NameValueCollection>>
     {
         public IDatabaseReadCommand Command { get; set; }
         
@@ -15,7 +16,7 @@ namespace SessionTracker.Modules.Data.Database
             this.Command = command;
         }
 
-        public virtual IList<object> ExecuteCommand()
+        public virtual IEnumerable<NameValueCollection> ExecuteCommand()
         {
             return this.Command.Execute();
         }

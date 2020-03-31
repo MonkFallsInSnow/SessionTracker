@@ -66,35 +66,58 @@ namespace SessionTracker
             sessionDataGridView.AutoGenerateColumns = true;
             sessionDataGridView.DataSource = source;
 
+            foreach(DataGridViewColumn c in sessionDataGridView.Columns)
+            {
+                c.ReadOnly = true;
+            }
+
             DataGridViewComboBoxColumn tutorSelectorColumn = new DataGridViewComboBoxColumn();
             DataGridViewComboBoxColumn topicSelectorColumn = new DataGridViewComboBoxColumn();
             DataGridViewColumn notesColumn = new DataGridViewColumn();
             DataGridViewButtonColumn logButtonColumn = new DataGridViewButtonColumn();
 
-            //TODO: finish this
-            this.dataReader.Command = new GetTopicsCommand(this.database);
-            BindingList<Tutor> tutors = (BindingList<Tutor>)this.dataReader.ExecuteCommand();
+            this.dataReader.Command = new GetTutorsCommand(this.database);
+            BindingList<Tutor> tutors = new BindingList<Tutor>();
+            foreach(var item in this.dataReader.ExecuteCommand())
+            {
+                tutors.Add(
+                    new Tutor(
+                        Convert.ToInt32(item["ID"]),
+                        item["FName"],
+                        item["LName"],
+                        Convert.ToBoolean(Convert.ToInt32(item["IsActive"]))
+                    )
+                );
+            }
+
             tutorSelectorColumn.DataSource = tutors;
             tutorSelectorColumn.HeaderText = "Tutors";
+            sessionDataGridView.Columns.Add(tutorSelectorColumn);
 
             this.dataReader.Command = new GetTopicsCommand(this.database);
-            BindingList<Topic> topics = (BindingList<Topic>)this.dataReader.ExecuteCommand();
+            BindingList<Topic> topics = new BindingList<Topic>();
+            foreach(var item in this.dataReader.ExecuteCommand())
+            {
+                topics.Add(
+                    new Topic(
+                        Convert.ToInt32(item["ID"]),
+                        item["Description"],
+                        Convert.ToInt32(item["CourseID"])
+                    )
+                );
+            }
+
             topicSelectorColumn.DataSource = topics;
             topicSelectorColumn.HeaderText = "Topics";
+            sessionDataGridView.Columns.Add(topicSelectorColumn);
 
             notesColumn.HeaderText = "Notes";
+            notesColumn.CellTemplate = new DataGridViewTextBoxCell();
+            sessionDataGridView.Columns.Add(notesColumn);
 
-            logButtonColumn.Text = "Log Session";
-
-
-
-            //BindingList<Tutor> tutors = (BindingList<Tutor>)dataHandler.GetTutors(this.SessionCampus.ID);
-
-            //source = new BindingSource(signInData, null);
-            //logGrid.DataSource = source;
-
-            //source = new BindingSource(tutors, null);
-            //tutorComboBox.DataSource = source;
+            logButtonColumn.Text = "Log";
+            logButtonColumn.UseColumnTextForButtonValue = true;
+            sessionDataGridView.Columns.Add(logButtonColumn);
         }
 
         private void StartBackgroundWorker()
@@ -127,5 +150,16 @@ namespace SessionTracker
         {
 
         }
+        
+        private void sessionDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView senderGrid = (DataGridView)sender;
+
+            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
+            {
+                //var session = 
+            }
+        }
+        
     }
 }

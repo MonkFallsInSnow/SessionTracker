@@ -13,7 +13,6 @@ namespace SessionTracker.Modules.Data.Models
         private string lname;
         private string studentID;
         private string course;
-        private bool isLogged;
 
         public string Center
         {
@@ -75,17 +74,7 @@ namespace SessionTracker.Modules.Data.Models
             }
         }
 
-        public bool IsLogged
-        {
-            get => this.isLogged;
-            set
-            {
-                this.isLogged = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public SignInData(string center, string campus, string id, string fname, string lname, string course, bool isLogged = false)
+        public SignInData(string center, string campus, string id, string fname, string lname, string course)
         {
             this.timestamp = DateTime.Now;
             this.Center = center;
@@ -94,7 +83,6 @@ namespace SessionTracker.Modules.Data.Models
             this.LName = lname;
             this.Course = course;
             this.StudentID = id;
-            this.IsLogged = isLogged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
