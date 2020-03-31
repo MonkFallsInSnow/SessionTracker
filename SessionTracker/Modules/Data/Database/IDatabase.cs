@@ -8,6 +8,8 @@ namespace SessionTracker.Modules.Data
     public interface IDatabase : IDisposable
     {
         SQLiteConnection Connection { get; }
-        IList<object> GetCampuses(); 
+        IList<object> GetCampuses();
+        IList<object> GetTutors();
+        IList<object> GetTopics();
     }
 }

@@ -3,19 +3,52 @@
 
 namespace SessionTracker.Modules.Data.Database
 {
-    class GetCampusesCommand : IDatabaseReadCommand
+    abstract class BaseReadCommand : IDatabaseReadCommand
     {
-        private readonly IDatabase database;
+        protected readonly IDatabase database;
 
-        public GetCampusesCommand(IDatabase database)
+        public BaseReadCommand(IDatabase database)
         {
             this.database = database;
         }
 
-        public IList<object> Execute()
+        public abstract IList<object> Execute();
+    }
+
+    class GetCampusesCommand : BaseReadCommand
+    {
+        public GetCampusesCommand(IDatabase database) : base(database)
+        {
+        }
+
+        public override IList<object> Execute()
         {
             return this.database.GetCampuses();
         }
     }
-    
+
+    class GetTutorsCommand : BaseReadCommand
+    {
+        public GetTutorsCommand(IDatabase database) : base(database)
+        {
+        }
+
+        public override IList<object> Execute()
+        {
+            return this.database.GetTutors();
+        }
+    }
+
+    class GetTopicsCommand : BaseReadCommand
+    {
+        public GetTopicsCommand(IDatabase database) : base(database)
+        {
+        }
+
+        public override IList<object> Execute()
+        {
+            return this.database.GetTopics();
+        }
+    }
+
 }

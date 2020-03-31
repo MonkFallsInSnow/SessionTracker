@@ -39,6 +39,7 @@ namespace SessionTracker
         private Timer eventTimer;
 
         private DatabaseReader dataReader;
+        private DatabaseWriter dataWriter;
 
         public SessionTrackerMainForm(IDatabase database, IMessageHandler messageHandler, string cookie, Campus campus)
         {
@@ -49,21 +50,44 @@ namespace SessionTracker
             this.database = database;
             this.messageHandler = messageHandler;
             this.dataReader = new DatabaseReader();
+            this.dataWriter = new DatabaseWriter();
 
             this.Text = $"Session Tracker - {this.activeCampus.Name}";
-            
+
             this.InitializeDataGridView();
             this.StartBackgroundWorker();
         }
 
         private void InitializeDataGridView()
         {
-            BindingList<SignInData> dataSource = this.GetSignInData();
-            BindingSource source = new BindingSource(dataSource, null);
+            BindingList<SignInData> signIns = this.GetSignInData();
+            BindingSource source = new BindingSource(signIns, null);
 
             sessionDataGridView.AutoGenerateColumns = true;
             sessionDataGridView.DataSource = source;
-            
+
+            DataGridViewComboBoxColumn tutorSelectorColumn = new DataGridViewComboBoxColumn();
+            DataGridViewComboBoxColumn topicSelectorColumn = new DataGridViewComboBoxColumn();
+            DataGridViewColumn notesColumn = new DataGridViewColumn();
+            DataGridViewButtonColumn logButtonColumn = new DataGridViewButtonColumn();
+
+            //TODO: finish this
+            this.dataReader.Command = new GetTopicsCommand(this.database);
+            BindingList<Tutor> tutors = (BindingList<Tutor>)this.dataReader.ExecuteCommand();
+            tutorSelectorColumn.DataSource = tutors;
+            tutorSelectorColumn.HeaderText = "Tutors";
+
+            this.dataReader.Command = new GetTopicsCommand(this.database);
+            BindingList<Topic> topics = (BindingList<Topic>)this.dataReader.ExecuteCommand();
+            topicSelectorColumn.DataSource = topics;
+            topicSelectorColumn.HeaderText = "Topics";
+
+            notesColumn.HeaderText = "Notes";
+
+            logButtonColumn.Text = "Log Session";
+
+
+
             //BindingList<Tutor> tutors = (BindingList<Tutor>)dataHandler.GetTutors(this.SessionCampus.ID);
 
             //source = new BindingSource(signInData, null);

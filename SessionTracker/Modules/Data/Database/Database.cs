@@ -1,14 +1,11 @@
-﻿using SessionTracker.Modules.Data.Models;
-using SessionTracker.Modules.Messaging;
+﻿using SessionTracker.Modules.Messaging;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data.SQLite;
 using System.Windows.Forms;
 
 namespace SessionTracker.Modules.Data.Database
 {
-    class Database : IDatabase
+    partial class Database : IDatabase
     {
         private static readonly string CreateStatementsLocation = @"../../Modules/Data/SQL/create.sql";
 
@@ -39,8 +36,8 @@ namespace SessionTracker.Modules.Data.Database
             if (System.IO.File.Exists(databaseName))
             {
                 System.IO.FileStream dbFile = System.IO.File.OpenRead(databaseName);
-                
-                if(dbFile.Length == 0)
+
+                if (dbFile.Length == 0)
                 {
                     dbFile.Dispose();
                     this.CreateTables();
@@ -62,23 +59,20 @@ namespace SessionTracker.Modules.Data.Database
 
         private void CreateTables()
         {
-            //using (this.connection)
+            this.connection.Open();
+
+            try
             {
-                this.connection.Open();
-
-                try
+                SQLiteCommand command = new SQLiteCommand(this.connection)
                 {
-                    SQLiteCommand command = new SQLiteCommand(this.connection)
-                    {
-                        CommandText = System.IO.File.ReadAllText(CreateStatementsLocation)
-                    };
+                    CommandText = System.IO.File.ReadAllText(CreateStatementsLocation)
+                };
 
-                    command.ExecuteNonQuery();
-                }
-                catch (System.IO.FileNotFoundException)
-                {
-                    this.errorHandler.ShowDialog("Database Error", "Failed to create database tables.", MessageBoxIcon.Error);
-                }
+                command.ExecuteNonQuery();
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                this.errorHandler.ShowDialog("Database Error", "Failed to create database tables.", MessageBoxIcon.Error);
             }
         }
 
@@ -88,28 +82,6 @@ namespace SessionTracker.Modules.Data.Database
             {
                 this.connection.Dispose();
             }
-
-            //this.Dispose();
-        }
-
-        public IList<object> GetCampuses()
-        {
-            IList<object> campuses = new BindingList<object>();
-
-            using (SQLiteCommand command = new SQLiteCommand(this.connection))
-            {
-                command.CommandText = "select ID, Name from Campus";
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        campuses.Add(new Campus(reader.GetInt32(0), reader.GetString(1)));
-                    }
-                }
-            }
-
-            return campuses;
         }
     }
 }
