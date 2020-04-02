@@ -76,7 +76,7 @@ namespace SessionTracker
             DataGridViewColumn notesColumn = new DataGridViewColumn();
             DataGridViewButtonColumn logButtonColumn = new DataGridViewButtonColumn();
 
-            this.dataReader.Command = new GetTutorsCommand(this.database);
+            this.dataReader.Command = new GetTutorsByCampusCommand(this.database, this.activeCampus.Name);
             BindingList<Tutor> tutors = new BindingList<Tutor>();
             foreach(var item in this.dataReader.ExecuteCommand())
             {
@@ -157,9 +157,41 @@ namespace SessionTracker
 
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
             {
-                //var session = 
+                SignInData data = (SignInData)senderGrid.CurrentRow.DataBoundItem;
+                DataGridViewCellCollection cells = senderGrid.CurrentRow.Cells;
+                Session session = CreateSession(data, cells);
+
+
+
             }
         }
-        
+
+        private Session CreateSession(SignInData data, DataGridViewCellCollection cells)
+        {
+            this.dataReader.Command = new GetLastInsertedRowIDCommand(this.database, "Session");
+            Session session = new Session(Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]));
+
+            session.StudentID = data.StudentID;
+            session.Timestamp = data.Timestamp;
+            session.Notes = cells["Notes"].Value.ToString();
+            session.IsWorkshop = Convert.ToBoolean(cells["IsWorkshop"].Value);
+
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Campus", cells["Campus"].Value.ToString());
+            session.CampusID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", cells["Course"].Value.ToString());
+            session.CourseID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", cells["Center"].Value.ToString());
+            session.CenterID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Tutor", cells["Tutor"].Value.ToString());
+            session.TutorID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Topic", cells["Topic"].Value.ToString());
+            session.TopicID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+
+            return session;
+        }
     }
 }

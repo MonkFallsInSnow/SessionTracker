@@ -12,7 +12,7 @@ namespace SessionTracker.Modules.Data.Database
 {
     partial class Database
     {
-        public IEnumerable<NameValueCollection> LookUp(string columns, string table)
+        public IEnumerable<NameValueCollection> QuickLookUp(string columns, string table)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
             {
@@ -26,12 +26,12 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
-        //TODO: this is open to sqlinjection attack (whereClause param)
-        public IEnumerable<NameValueCollection> LookUpWhere(string columns, string table, string whereClause)
+        public IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereColumn, string value)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
             {
-                command.CommandText = $"select {columns} from {table} {whereClause}";
+                command.CommandText = $"select {columns} from {table} where {whereColumn} = @value;";
+                command.Parameters.AddWithValue("@value", value);
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
@@ -41,15 +41,49 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
-        public SQLiteDataReader LookUpComplex(string commandText)
+        public IEnumerable<NameValueCollection> GetTutorsByCampus(string campusName)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
             {
-                command.CommandText = commandText;
-                return command.ExecuteReader();
+                command.CommandText = "" +
+                    "select t.ID, t.FName, t.LName, t.IsActive " +
+                    "from Tutor as t " +
+                    "join TutorCampus as tc on t.ID = tc.TutorID " +
+                    "join Campus as c on tc.CampusID = c.ID " +
+                    "where c.Name = @campusName";
+
+                command.Parameters.AddWithValue("@campusName", campusName);
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        yield return reader.GetValues();
+                }
             }
         }
 
+        /*
+        public int GetReferenceID(string sourceTable, string referenceTable, string filterColumn, string filterValue)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(this.connection))
+            {
+                command.CommandText = $"select ID from @referenceTable " +
+                    "join @referenceTable on @referenceTable.ID = @sourceTable.ID " +
+                    "where @sourceTable.@filterColumn = @filterValue;";
+
+                command.Parameters.AddWithValue("@referenceTable", referenceTable);
+                command.Parameters.AddWithValue("@sourceTable", sourceTable);
+                command.Parameters.AddWithValue("@filterColumn", filterColumn);
+                command.Parameters.AddWithValue("@filterValue", filterValue);
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    return reader.GetInt32(0);
+                }
+            }
+        }
+        */
+        /*
         public IList<object> GetCampuses()
         {
             IList<object> campuses = new BindingList<object>();
@@ -109,5 +143,6 @@ namespace SessionTracker.Modules.Data.Database
 
             return topics;
         }
+        */
     }
 }

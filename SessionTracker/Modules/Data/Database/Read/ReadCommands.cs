@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Data.SQLite;
+using System.Linq;
 
 namespace SessionTracker.Modules.Data.Database
 {
@@ -24,19 +24,23 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.LookUp("ID, Name", "Campus");
+            return this.database.QuickLookUp("ID, Name", "Campus");
         }
     }
 
-    class GetTutorsCommand : BaseReadCommand
+    class GetTutorsByCampusCommand : BaseReadCommand
     {
-        public GetTutorsCommand(IDatabase database) : base(database)
+        private string campusName;
+
+        public GetTutorsByCampusCommand(IDatabase database, string campusName) : base(database)
         {
+            this.campusName = campusName;
         }
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.LookUpWhere("ID, FName, LName, IsActive", "Tutor", "where IsActive = 1");
+            return this.database.GetTutorsByCampus(campusName);
+            
         }
     }
 
@@ -48,7 +52,39 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.LookUp("ID, Description, CourseID", "Topic");
+            return this.database.QuickLookUp("ID, Description, CourseID", "Topic");
+        }
+    }
+
+    class GetReferenceIDCommand : BaseReadCommand
+    {
+        private string column;
+        private string identifier;
+
+        public GetReferenceIDCommand(IDatabase database, string column, string identifier) : base(database)
+        {
+            this.column = column;
+            this.identifier = identifier;
+        }
+
+        public override IEnumerable<NameValueCollection> Execute()
+        {
+            return this.database.QuickLookUp("ID", column, "Name", identifier);
+        }
+    }
+
+    class GetLastInsertedRowIDCommand : BaseReadCommand
+    {
+        private string table;
+
+        public GetLastInsertedRowIDCommand(IDatabase database, string table) : base(database)
+        {
+            this.table = table;
+        }
+
+        public override IEnumerable<NameValueCollection> Execute()
+        {
+            return this.database.QuickLookUp("seq", "sqlite_sequence", "name", table);
         }
     }
     /*

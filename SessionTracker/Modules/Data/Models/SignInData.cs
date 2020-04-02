@@ -6,13 +6,14 @@ namespace SessionTracker.Modules.Data.Models
 {
     public class SignInData : INotifyPropertyChanged
     {
-        private DateTime timestamp;
         private string center;
         private string campus;
         private string fname;
         private string lname;
         private string studentID;
         private string course;
+
+        public DateTime Timestamp { get; private set; }
 
         public string Center
         {
@@ -76,7 +77,7 @@ namespace SessionTracker.Modules.Data.Models
 
         public SignInData(string center, string campus, string id, string fname, string lname, string course)
         {
-            this.timestamp = DateTime.Now;
+            this.Timestamp = DateTime.Now;
             this.Center = center;
             this.Campus = campus;
             this.FName = fname;
@@ -121,7 +122,7 @@ namespace SessionTracker.Modules.Data.Models
                 this.FName == data.FName &&
                 this.LName == data.FName &&
                 this.Course == data.Course &&
-                this.timestamp.Day == data.timestamp.Day;
+                this.Timestamp.Day == data.Timestamp.Day;
         }
     }
 }
