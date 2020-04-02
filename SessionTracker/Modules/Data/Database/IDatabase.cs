@@ -1,6 +1,7 @@
 ﻿using SessionTracker.Modules.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 
 namespace SessionTracker.Modules.Data
@@ -8,8 +9,8 @@ namespace SessionTracker.Modules.Data
     public interface IDatabase : IDisposable
     {
         SQLiteConnection Connection { get; }
-        IList<object> GetCampuses();
-        IList<object> GetTutors();
-        IList<object> GetTopics();
+        IEnumerable<NameValueCollection> QuickLookUp(string columns, string table);
+        IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereColumn, string value);
+        IEnumerable<NameValueCollection> GetTutorsByCampus(string campusName);
     }
 }

@@ -76,6 +76,7 @@
     <Compile Include="LoginDialog.Designer.cs">
       <DependentUpon>LoginDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Data\Database\DatabaseSelect.cs" />
     <Compile Include="Modules\Data\Database\Read\ReadCommands.cs" />
     <Compile Include="Modules\Data\Database\Database.cs" />
     <Compile Include="Modules\Data\Database\Write\DatabaseWriter.cs" />
@@ -85,7 +86,10 @@
     <Compile Include="Modules\Data\Database\Read\DatabaseReader.cs" />
     <Compile Include="Modules\Data\Database\Write\WriteCommands.cs" />
     <Compile Include="Modules\Data\Models\Campus.cs" />
+    <Compile Include="Modules\Data\Models\Session.cs" />
     <Compile Include="Modules\Data\Models\SignInData.cs" />
+    <Compile Include="Modules\Data\Models\Topic.cs" />
+    <Compile Include="Modules\Data\Models\Tutor.cs" />
     <Compile Include="Modules\Messaging\MessageHandler.cs" />
     <Compile Include="Modules\Messaging\IMessageHandler.cs" />
     <Compile Include="Modules\Requests\DataRequest.cs" />

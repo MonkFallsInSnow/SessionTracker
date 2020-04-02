@@ -30,9 +30,9 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.sessionDataGridView = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.getSessionDataWorker = new System.ComponentModel.BackgroundWorker();
-            this.sessionDataGridView = new System.Windows.Forms.DataGridView();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sessionDataGridView)).BeginInit();
@@ -60,6 +60,18 @@
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // sessionDataGridView
+            // 
+            this.sessionDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.sessionDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sessionDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.sessionDataGridView.Location = new System.Drawing.Point(3, 3);
+            this.sessionDataGridView.Name = "sessionDataGridView";
+            this.sessionDataGridView.RowTemplate.Height = 24;
+            this.sessionDataGridView.Size = new System.Drawing.Size(667, 415);
+            this.sessionDataGridView.TabIndex = 0;
+            this.sessionDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.sessionDataGridView_CellContentClick);
+            // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
@@ -73,16 +85,6 @@
             // getSessionDataWorker
             // 
             this.getSessionDataWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.getSessionDataWorker_DoWork);
-            // 
-            // sessionDataGridView
-            // 
-            this.sessionDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.sessionDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sessionDataGridView.Location = new System.Drawing.Point(3, 3);
-            this.sessionDataGridView.Name = "sessionDataGridView";
-            this.sessionDataGridView.RowTemplate.Height = 24;
-            this.sessionDataGridView.Size = new System.Drawing.Size(667, 415);
-            this.sessionDataGridView.TabIndex = 0;
             // 
             // SessionTrackerMainForm
             // 

@@ -45,12 +45,10 @@ namespace SessionTracker
 
             IDatabaseReadCommand command = new GetCampusesCommand(this.database);
             DatabaseReader invoker = new DatabaseReader(command);
-
-            var data = invoker.ExecuteCommand();
             
-            foreach (var d in data)
+            foreach (var item in invoker.ExecuteCommand())
             {
-                campuses.Add((Campus)d);
+                campuses.Add(new Campus(Convert.ToInt32(item["ID"]), item["Name"]));
             }
 
             return campuses;

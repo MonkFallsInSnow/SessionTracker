@@ -1,4 +1,15 @@
 BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Tutor" (
+	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"FName"	TEXT NOT NULL,
+	"LName"	TEXT NOT NULL,
+	"IsActive"	INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS "Topic" (
+	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"Description"	TEXT NOT NULL UNIQUE,
+	"CourseID"	INTEGER NOT NULL
+);
 CREATE TABLE IF NOT EXISTS "Center" (
 	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"Name"	TEXT NOT NULL UNIQUE
@@ -17,10 +28,6 @@ CREATE TABLE IF NOT EXISTS "TutorCampus" (
 	FOREIGN KEY("TutorID") REFERENCES "Tutor"("ID"),
 	FOREIGN KEY("CampusID") REFERENCES "Campus"("ID")
 );
-CREATE TABLE IF NOT EXISTS "Topic" (
-	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	"Description"	TEXT NOT NULL UNIQUE
-);
 CREATE TABLE IF NOT EXISTS "Session" (
 	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"Timestamp"	TEXT NOT NULL,
@@ -38,11 +45,6 @@ CREATE TABLE IF NOT EXISTS "Session" (
 	FOREIGN KEY("CenterID") REFERENCES "Center"("ID"),
 	FOREIGN KEY("TutorID") REFERENCES "Tutor"("ID")
 );
-CREATE TABLE IF NOT EXISTS "Tutor" (
-	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	"FName"	TEXT NOT NULL,
-	"LName"	TEXT NOT NULL
-);
 CREATE TABLE IF NOT EXISTS "Campus" (
 	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"Name"	TEXT NOT NULL UNIQUE
@@ -57,6 +59,9 @@ CREATE TABLE IF NOT EXISTS "Student" (
 	"LName"	TEXT NOT NULL,
 	PRIMARY KEY("StudentID")
 );
+INSERT INTO "Tutor" ("ID","FName","LName","IsActive") VALUES (1,'Conrad','Lewin',1),
+ (2,'James','Strickland',1),
+ (3,'Aaron','Donaldson',1);
 INSERT INTO "Center" ("ID","Name") VALUES (1,'Computer Center'),
  (2,'Writing Center'),
  (3,'Math Center');
@@ -65,9 +70,6 @@ INSERT INTO "TutorCampus" ("TutorID","CampusID") VALUES (1,1),
  (3,1),
  (1,2),
  (1,3);
-INSERT INTO "Tutor" ("ID","FName","LName") VALUES (1,'Conrad','Lewin'),
- (2,'James','Strickland'),
- (3,'Aaron','Donaldson');
 INSERT INTO "Campus" ("ID","Name") VALUES (1,'RTP Campus'),
  (2,'North Campus'),
  (3,'South Campus');
