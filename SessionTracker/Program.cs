@@ -1,4 +1,5 @@
 ﻿using SessionTracker.Modules.Data;
+using SessionTracker.Modules.Data.Database;
 using SessionTracker.Modules.Data.Models;
 using SessionTracker.Modules.Messaging;
 using SessionTracker.Modules.Requests;
@@ -26,7 +27,6 @@ namespace SessionTracker
             IMessageHandler messageHandler = new MessageHandler();
 
             using (IDatabase database = new Database("database.sqlite", messageHandler))
-            using (database.Connection)
             {
                 database.Connection.Open();
 
@@ -44,9 +44,15 @@ namespace SessionTracker
                 else if (result == DialogResult.OK)
                 {
                     loginDialog.Close();
-                    SessionTrackerMainForm mainForm = new SessionTrackerMainForm();
-                    Application.Run(mainForm);
 
+                    SessionTrackerMainForm mainForm = new SessionTrackerMainForm(
+                        database, 
+                        messageHandler, 
+                        loginDialog.ActiveCookie, 
+                        loginDialog.ActiveCampus
+                    );
+
+                    Application.Run(mainForm);
                 }
                 else
                 {
@@ -54,6 +60,7 @@ namespace SessionTracker
                 }
             }
         }
+
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
     }

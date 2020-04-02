@@ -29,18 +29,18 @@
         private void InitializeComponent()
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.sessionTrackerTabs = new System.Windows.Forms.TabPage();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.sessionDataGridView = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.getSessionDataWorker = new System.ComponentModel.BackgroundWorker();
             this.tabControl1.SuspendLayout();
-            this.sessionTrackerTabs.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sessionDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.sessionTrackerTabs);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
@@ -49,32 +49,35 @@
             this.tabControl1.Size = new System.Drawing.Size(681, 450);
             this.tabControl1.TabIndex = 0;
             // 
-            // sessionTrackerTabs
+            // tabPage1
             // 
-            this.sessionTrackerTabs.Controls.Add(this.sessionDataGridView);
-            this.sessionTrackerTabs.Location = new System.Drawing.Point(4, 25);
-            this.sessionTrackerTabs.Name = "sessionTrackerTabs";
-            this.sessionTrackerTabs.Padding = new System.Windows.Forms.Padding(3);
-            this.sessionTrackerTabs.Size = new System.Drawing.Size(673, 421);
-            this.sessionTrackerTabs.TabIndex = 0;
-            this.sessionTrackerTabs.Text = "tabPage1";
-            this.sessionTrackerTabs.UseVisualStyleBackColor = true;
+            this.tabPage1.Controls.Add(this.sessionDataGridView);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(673, 421);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // sessionDataGridView
             // 
             this.sessionDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.sessionDataGridView.Location = new System.Drawing.Point(6, 6);
+            this.sessionDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sessionDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.sessionDataGridView.Location = new System.Drawing.Point(3, 3);
             this.sessionDataGridView.Name = "sessionDataGridView";
             this.sessionDataGridView.RowTemplate.Height = 24;
-            this.sessionDataGridView.Size = new System.Drawing.Size(659, 150);
-            this.sessionDataGridView.TabIndex = 1;
+            this.sessionDataGridView.Size = new System.Drawing.Size(667, 415);
+            this.sessionDataGridView.TabIndex = 0;
+            this.sessionDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.sessionDataGridView_CellContentClick);
             // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1272, 421);
+            this.tabPage2.Size = new System.Drawing.Size(673, 421);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -92,7 +95,7 @@
             this.Name = "SessionTrackerMainForm";
             this.Text = "Form1";
             this.tabControl1.ResumeLayout(false);
-            this.sessionTrackerTabs.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.sessionDataGridView)).EndInit();
             this.ResumeLayout(false);
 
@@ -101,10 +104,10 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage sessionTrackerTabs;
+        private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.DataGridView sessionDataGridView;
         private System.ComponentModel.BackgroundWorker getSessionDataWorker;
+        private System.Windows.Forms.DataGridView sessionDataGridView;
     }
 }
 

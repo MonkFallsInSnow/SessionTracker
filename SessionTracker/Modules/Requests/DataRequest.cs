@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using SessionTracker.Modules.Data.Models;
 using SessionTracker.Modules.Messaging;
-using SessionTracker.Utility;
 using System;
 using System.ComponentModel;
 using System.Net;
@@ -115,9 +114,11 @@ namespace SessionTracker.Modules.Requests
             return null;
         }
 
-        private Tuple<string, string> ParseName(string v)
+        //TODO: prepare for the possibility that there are not two parts to the name
+        private Tuple<string, string> ParseName(string name)
         {
-            throw new NotImplementedException();
+            string[] parts = name.Split(',');
+            return new System.Tuple<string, string>(parts[0], parts[1]);
         }
 
         private string ExtractStudentID(string value)
