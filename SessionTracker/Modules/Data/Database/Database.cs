@@ -1,5 +1,6 @@
 ﻿using SessionTracker.Modules.Messaging;
 using System;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Windows.Forms;
 
@@ -81,6 +82,35 @@ namespace SessionTracker.Modules.Data.Database
             if (this.connection != null)
             {
                 this.connection.Dispose();
+            }
+        }
+
+        public int InsertSession(NameValueCollection session)
+        {
+            try
+            {
+                using (SQLiteCommand command = new SQLiteCommand())
+                {
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    sb.Append("insert into Session values ");
+                    sb.Append("ID, Timestamp, StudentID, CourseID, CampusID, TutorID, TopicID, Notes, IsWorkshop)");
+                    sb.Append(session["ID"] + ", ");
+                    sb.Append(session["Timestamp"] + ", ");
+                    sb.Append(session["StudentID"] + ", ");
+                    sb.Append(session["CourseID"] + ", ");
+                    sb.Append(session["TutorID"] + ", ");
+                    sb.Append(session["TopicID"] + ", ");
+                    sb.Append(session["Notes"] + ", ");
+                    sb.Append(session["IsWorkshop"] + ");");
+
+                    command.CommandText = sb.ToString();
+
+                    return command.ExecuteNonQuery();
+                }
+            }
+            catch(SQLiteException ex)
+            {
+                throw new SQLiteException(ex.Message);
             }
         }
     }

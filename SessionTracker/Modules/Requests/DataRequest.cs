@@ -101,12 +101,12 @@ namespace SessionTracker.Modules.Requests
                     Tuple<string, string> name = this.ParseName(element[(int)JsonDataIndex.StudentName].ToString());
 
                     return new SignInData(
+                        element[(int)JsonDataIndex.Center].ToString(),
+                        element[(int)JsonDataIndex.Campus].ToString(),
                         this.ExtractStudentID(element[(int)JsonDataIndex.StudentID].ToString()),
-                        name.Item1,
                         name.Item2,
-                        element[(int)JsonDataIndex.Course].ToString(),
-                        element[(int)JsonDataIndex.Course].ToString(),
-                        element[(int)JsonDataIndex.Campus].ToString()
+                        name.Item1,
+                        element[(int)JsonDataIndex.Course].ToString()
                     );
                 }
             }

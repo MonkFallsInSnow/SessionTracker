@@ -15,32 +15,12 @@ namespace SessionTracker.Modules.Data.Models
 
         public DateTime Timestamp { get; private set; }
 
-        public string Center
+        public string StudentID
         {
-            get => this.center;
+            get => this.studentID;
             set
             {
-                this.center = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public string Campus
-        {
-            get => this.campus;
-            set
-            {
-                this.campus = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public string FName
-        {
-            get => this.fname;
-            set
-            {
-                this.fname = value;
+                this.studentID = value;
                 NotifyPropertyChanged();
             }
         }
@@ -55,12 +35,32 @@ namespace SessionTracker.Modules.Data.Models
             }
         }
 
-        public string StudentID
+        public string FName
         {
-            get => this.studentID;
+            get => this.fname;
             set
             {
-                this.studentID = value;
+                this.fname = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string Campus
+        {
+            get => this.campus;
+            set
+            {
+                this.campus = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string Center
+        {
+            get => this.center;
+            set
+            {
+                this.center = value;
                 NotifyPropertyChanged();
             }
         }
@@ -80,10 +80,10 @@ namespace SessionTracker.Modules.Data.Models
             this.Timestamp = DateTime.Now;
             this.Center = center;
             this.Campus = campus;
+            this.StudentID = id;
             this.FName = fname;
             this.LName = lname;
             this.Course = course;
-            this.StudentID = id;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

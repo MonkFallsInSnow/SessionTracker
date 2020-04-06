@@ -11,6 +11,7 @@ namespace SessionTracker.Modules.Data
         SQLiteConnection Connection { get; }
         IEnumerable<NameValueCollection> QuickLookUp(string columns, string table);
         IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereColumn, string value);
-        IEnumerable<NameValueCollection> GetTutorsByCampus(string campusName);
+        IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName);
+        int InsertSession(NameValueCollection session);
     }
 }

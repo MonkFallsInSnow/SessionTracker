@@ -41,7 +41,7 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
-        public IEnumerable<NameValueCollection> GetTutorsByCampus(string campusName)
+        public IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
             {

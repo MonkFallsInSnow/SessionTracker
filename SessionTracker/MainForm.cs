@@ -5,8 +5,10 @@ using SessionTracker.Modules.Messaging;
 using SessionTracker.Modules.Requests;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SQLite;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -74,6 +76,7 @@ namespace SessionTracker
             DataGridViewComboBoxColumn tutorSelectorColumn = new DataGridViewComboBoxColumn();
             DataGridViewComboBoxColumn topicSelectorColumn = new DataGridViewComboBoxColumn();
             DataGridViewColumn notesColumn = new DataGridViewColumn();
+            DataGridViewCheckBoxColumn isWorkshopColumn = new DataGridViewCheckBoxColumn();
             DataGridViewButtonColumn logButtonColumn = new DataGridViewButtonColumn();
 
             this.dataReader.Command = new GetTutorsByCampusCommand(this.database, this.activeCampus.Name);
@@ -108,13 +111,20 @@ namespace SessionTracker
             }
 
             topicSelectorColumn.DataSource = topics;
-            topicSelectorColumn.HeaderText = "Topics";
+            topicSelectorColumn.Name = "Topics";
+            topicSelectorColumn.HeaderText = topicSelectorColumn.Name;
             sessionDataGridView.Columns.Add(topicSelectorColumn);
 
-            notesColumn.HeaderText = "Notes";
+            notesColumn.Name = "Notes";
+            notesColumn.HeaderText = notesColumn.HeaderText;
             notesColumn.CellTemplate = new DataGridViewTextBoxCell();
             sessionDataGridView.Columns.Add(notesColumn);
 
+            isWorkshopColumn.Name = "IsWorkshop";
+            isWorkshopColumn.HeaderText = isWorkshopColumn.Name;
+            sessionDataGridView.Columns.Add(isWorkshopColumn);
+
+            logButtonColumn.Name = "LogBtns";
             logButtonColumn.Text = "Log";
             logButtonColumn.UseColumnTextForButtonValue = true;
             sessionDataGridView.Columns.Add(logButtonColumn);
@@ -159,39 +169,56 @@ namespace SessionTracker
             {
                 SignInData data = (SignInData)senderGrid.CurrentRow.DataBoundItem;
                 DataGridViewCellCollection cells = senderGrid.CurrentRow.Cells;
-                Session session = CreateSession(data, cells);
+                NameValueCollection session = CreateSession(data, cells);
 
+                this.dataWriter.Command = new LogSessionCommand(this.database, session);
 
-
+                try
+                {
+                    int rowsInserted = this.dataWriter.ExecuteCommand();
+                }
+                catch(SQLiteException ex)
+                {
+                    this.messageHandler.ShowDialog("Database Error", ex.Message, MessageBoxIcon.Error);
+                }
             }
         }
 
-        private Session CreateSession(SignInData data, DataGridViewCellCollection cells)
+        private NameValueCollection CreateSession(SignInData data, DataGridViewCellCollection cells)
         {
             this.dataReader.Command = new GetLastInsertedRowIDCommand(this.database, "Session");
-            Session session = new Session(Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]));
+            NameValueCollection sessionData = new NameValueCollection();
 
-            session.StudentID = data.StudentID;
-            session.Timestamp = data.Timestamp;
-            session.Notes = cells["Notes"].Value.ToString();
-            session.IsWorkshop = Convert.ToBoolean(cells["IsWorkshop"].Value);
+            var id = this.dataReader.ExecuteCommand().FirstOrDefault();
+            string sessionID = id == null ? "0" : id[0];
+
+            sessionData.Add("ID", sessionID);
+            sessionData.Add("StudentID", data.StudentID);
+            sessionData.Add("Timestamp", data.Timestamp.ToString());
+            sessionData.Add("Notes", cells["Notes"].Value.ToString());
+            sessionData.Add("IsWorkshop", cells["IsWorkshop"].Value.ToString());
 
             this.dataReader.Command = new GetReferenceIDCommand(this.database, "Campus", cells["Campus"].Value.ToString());
-            session.CampusID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+            string campusID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("CampusID", campusID);
 
             this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", cells["Course"].Value.ToString());
-            session.CourseID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+            string courseID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("courseID", courseID);
 
             this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", cells["Center"].Value.ToString());
-            session.CenterID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+            string centerID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("centerID", centerID);
 
             this.dataReader.Command = new GetReferenceIDCommand(this.database, "Tutor", cells["Tutor"].Value.ToString());
-            session.TutorID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+            string tutorID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("tutorID", tutorID);
 
             this.dataReader.Command = new GetReferenceIDCommand(this.database, "Topic", cells["Topic"].Value.ToString());
-            session.TopicID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+            string topicID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("topicID", topicID);
 
-            return session;
+            return sessionData;
         }
     }
 }

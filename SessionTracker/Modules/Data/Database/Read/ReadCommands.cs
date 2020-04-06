@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
@@ -39,13 +40,15 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.GetTutorsByCampus(campusName);
+            return this.database.SelectTutorsByCampus(campusName);
             
         }
     }
 
     class GetTopicsCommand : BaseReadCommand
     {
+        //private string courseID;
+
         public GetTopicsCommand(IDatabase database) : base(database)
         {
         }
@@ -54,6 +57,23 @@ namespace SessionTracker.Modules.Data.Database
         {
             return this.database.QuickLookUp("ID, Description, CourseID", "Topic");
         }
+        /*
+        public GetTopicsCommand(IDatabase database, int courseID) : base(database)
+        {
+            this.courseID = courseID.ToString();
+        }
+
+        public GetTopicsCommand(IDatabase database, string courseName) : base(database)
+        {
+            NameValueCollection id = this.database.QuickLookUp("ID", "Course", "Name", courseName).FirstOrDefault();
+            this.courseID = id["ID"] == null ? string.Empty : id["ID"];
+        }
+
+        public override IEnumerable<NameValueCollection> Execute()
+        {
+            return this.database.QuickLookUp("ID, Description, CourseID", "Topic", "CourseID", this.courseID);
+        }
+        */
     }
 
     class GetReferenceIDCommand : BaseReadCommand
@@ -84,7 +104,7 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("seq", "sqlite_sequence", "name", table);
+            return this.database.QuickLookUp("seq", "sqlite_sequence", "Name", table);
         }
     }
     /*
