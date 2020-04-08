@@ -45,35 +45,20 @@ namespace SessionTracker.Modules.Data.Database
         }
     }
 
-    class GetTopicsCommand : BaseReadCommand
+    class GetTopicsByCourseCommand : BaseReadCommand
     {
-        //private string courseID;
+        private string courseName;
 
-        public GetTopicsCommand(IDatabase database) : base(database)
+        public GetTopicsByCourseCommand(IDatabase database, string courseName) : base(database)
         {
-        }
-
-        public override IEnumerable<NameValueCollection> Execute()
-        {
-            return this.database.QuickLookUp("ID, Description, CourseID", "Topic");
-        }
-        /*
-        public GetTopicsCommand(IDatabase database, int courseID) : base(database)
-        {
-            this.courseID = courseID.ToString();
-        }
-
-        public GetTopicsCommand(IDatabase database, string courseName) : base(database)
-        {
-            NameValueCollection id = this.database.QuickLookUp("ID", "Course", "Name", courseName).FirstOrDefault();
-            this.courseID = id["ID"] == null ? string.Empty : id["ID"];
+            this.courseName = courseName;
         }
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("ID, Description, CourseID", "Topic", "CourseID", this.courseID);
+            return this.database.SelectTopicsByCourse(courseName);
         }
-        */
+        
     }
 
     class GetReferenceIDCommand : BaseReadCommand
@@ -107,41 +92,5 @@ namespace SessionTracker.Modules.Data.Database
             return this.database.QuickLookUp("seq", "sqlite_sequence", "Name", table);
         }
     }
-    /*
-    class GetCampusesCommand : BaseReadCommand
-    {
-        public GetCampusesCommand(IDatabase database) : base(database)
-        {
-        }
-
-        public override IList<object> Execute()
-        {
-            return this.database.GetCampuses();
-        }
-    }
-    
-    class GetTutorsCommand : BaseReadCommand
-    {
-        public GetTutorsCommand(IDatabase database) : base(database)
-        {
-        }
-
-        public override IList<object> Execute()
-        {
-            return this.database.GetTutors();
-        }
-    }
-
-    class GetTopicsCommand : BaseReadCommand
-    {
-        public GetTopicsCommand(IDatabase database) : base(database)
-        {
-        }
-
-        public override IList<object> Execute()
-        {
-            return this.database.GetTopics();
-        }
-    }
-    */
+   
 }

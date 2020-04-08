@@ -12,6 +12,7 @@ namespace SessionTracker.Modules.Data
         IEnumerable<NameValueCollection> QuickLookUp(string columns, string table);
         IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereColumn, string value);
         IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName);
+        IEnumerable<NameValueCollection> SelectTopicsByCourse(string courseName);
         int InsertSession(NameValueCollection session);
     }
 }

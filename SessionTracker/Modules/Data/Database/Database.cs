@@ -1,5 +1,6 @@
 ﻿using SessionTracker.Modules.Messaging;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Windows.Forms;
@@ -113,5 +114,6 @@ namespace SessionTracker.Modules.Data.Database
                 throw new SQLiteException(ex.Message);
             }
         }
+
     }
 }

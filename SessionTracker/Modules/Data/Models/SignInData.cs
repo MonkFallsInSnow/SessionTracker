@@ -6,6 +6,8 @@ namespace SessionTracker.Modules.Data.Models
 {
     public class SignInData : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private string center;
         private string campus;
         private string fname;
@@ -85,8 +87,6 @@ namespace SessionTracker.Modules.Data.Models
             this.LName = lname;
             this.Course = course;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {

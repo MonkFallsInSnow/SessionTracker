@@ -9,19 +9,17 @@ namespace SessionTracker.Modules.Data.Models
     public class Topic
     {
         public int ID { get; set; }
-        public string Description { get; set; }
-        public int CourseID { get; set; }
+        public string Name { get; set; }
 
-        public Topic(int id, string description, int courseID)
+        public Topic(int id, string name)
         {
             this.ID = id;
-            this.Description = description;
-            this.CourseID = courseID;
+            this.Name = name;
         }
 
         public override string ToString()
         {
-            return $"{this.Description}";
+            return $"{this.Name}";
         }
     }
 }
