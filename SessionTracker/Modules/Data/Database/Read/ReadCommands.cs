@@ -63,18 +63,37 @@ namespace SessionTracker.Modules.Data.Database
 
     class GetReferenceIDCommand : BaseReadCommand
     {
-        private string column;
-        private string identifier;
+        private string table;
+        private string where;
+        private string value;
 
-        public GetReferenceIDCommand(IDatabase database, string column, string identifier) : base(database)
+        public GetReferenceIDCommand(IDatabase database, string table, string where, string value) : base(database)
         {
-            this.column = column;
-            this.identifier = identifier;
+            this.table = table;
+            this.where = where;
+            this.value = value;
         }
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("ID", column, "Name", identifier);
+            return this.database.QuickLookUp("ID", table, where, value);
+        }
+    }
+
+    class GetReferenceIDComplexCommand : BaseReadCommand
+    {
+        private string table;
+        private string whereExpression;
+
+        public GetReferenceIDComplexCommand(IDatabase database, string table, string whereExpression) : base(database)
+        {
+            this.table = table;
+            this.whereExpression = whereExpression;
+        }
+
+        public override IEnumerable<NameValueCollection> Execute()
+        {
+            return this.database.QuickLookUp("ID", table, whereExpression);
         }
     }
 

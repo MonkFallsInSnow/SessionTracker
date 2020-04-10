@@ -50,10 +50,17 @@ namespace SessionTracker.Modules.Data.Database
 
         public override int Execute()
         {
-            return this.Execute(() =>
+            try
             {
-                return this.database.InsertSession(this.session);
-            });
+                return this.Execute(() =>
+                {
+                    return this.database.InsertSession(this.session);
+                });
+            }
+            catch(SQLiteException ex)
+            {
+                throw new SQLiteException(ex.Message);
+            }
         }
     }
 }

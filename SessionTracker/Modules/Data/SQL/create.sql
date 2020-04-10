@@ -16,10 +16,6 @@ CREATE TABLE IF NOT EXISTS "Student" (
 	"LName"	TEXT NOT NULL,
 	PRIMARY KEY("StudentID")
 );
-CREATE TABLE IF NOT EXISTS "Course" (
-	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	"Code"	TEXT NOT NULL UNIQUE
-);
 CREATE TABLE IF NOT EXISTS "Campus" (
 	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"Name"	TEXT NOT NULL UNIQUE
@@ -65,6 +61,10 @@ CREATE TABLE IF NOT EXISTS "Tutor" (
 	"LName"	TEXT NOT NULL,
 	"IsActive"	INTEGER NOT NULL DEFAULT 1
 );
+CREATE TABLE IF NOT EXISTS "Course" (
+	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"Name"	TEXT NOT NULL UNIQUE
+);
 INSERT INTO "Topic" ("ID","Name") VALUES (1,'Views'),
  (2,'Documentation'),
  (3,'Style'),
@@ -78,7 +78,21 @@ INSERT INTO "CourseTopic" ("CourseID","TopicID") VALUES (2,2),
  (2,5),
  (2,6),
  (21,7);
-INSERT INTO "Course" ("ID","Code") VALUES (1,'DBA 120'),
+INSERT INTO "Campus" ("ID","Name") VALUES (1,'RTP Campus'),
+ (2,'North Campus'),
+ (3,'South Campus');
+INSERT INTO "TutorCampus" ("TutorID","CampusID") VALUES (1,1),
+ (2,1),
+ (3,1),
+ (1,2),
+ (1,3);
+INSERT INTO "Center" ("ID","Name") VALUES (1,'Computer Center'),
+ (2,'Writing Center'),
+ (3,'Math Center');
+INSERT INTO "Tutor" ("ID","FName","LName","IsActive") VALUES (1,'Conrad','Lewin',1),
+ (2,'James','Strickland',1),
+ (3,'Aaron','Donaldson',1);
+INSERT INTO "Course" ("ID","Name") VALUES (1,'DBA 120'),
  (2,'ACA 090'),
  (3,'ACA 122'),
  (4,'BUS 110'),
@@ -98,21 +112,7 @@ INSERT INTO "Course" ("ID","Code") VALUES (1,'DBA 120'),
  (18,'SOC 210'),
  (19,'MAT 171'),
  (20,'MAT 172'),
- (21,'Working Independently');
-INSERT INTO "Campus" ("ID","Name") VALUES (1,'RTP Campus'),
- (2,'North Campus'),
- (3,'South Campus');
-INSERT INTO "TutorCampus" ("TutorID","CampusID") VALUES (1,1),
- (2,1),
- (3,1),
- (1,2),
- (1,3);
-INSERT INTO "Center" ("ID","Name") VALUES (1,'Computer Center'),
- (2,'Writing Center'),
- (3,'Math Center');
-INSERT INTO "Tutor" ("ID","FName","LName","IsActive") VALUES (1,'Conrad','Lewin',1),
- (2,'James','Strickland',1),
- (3,'Aaron','Donaldson',1);
+ (21,'Wrk-Independent');
 CREATE INDEX IF NOT EXISTS "SessionIndex" ON "Session" (
 	"Timestamp"	DESC
 );

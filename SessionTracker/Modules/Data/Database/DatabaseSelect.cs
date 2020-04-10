@@ -41,6 +41,20 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
+        public IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereExpression)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(this.connection))
+            {
+                command.CommandText = $"select {columns} from {table} where {whereExpression}";
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        yield return reader.GetValues();
+                }
+            }
+        }
+
         public IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
@@ -67,15 +81,15 @@ namespace SessionTracker.Modules.Data.Database
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
             {
                 command.CommandText = "" +
-                    "select t.Name " +
+                    "select t.ID, t.Name " +
                     "from Topic as t " +
                     "join CourseTopic as ct " +
                     "on t.ID = ct.TopicID " +
                     "join Course as c " +
                     "on ct.CourseID = c.ID " +
-                    "where c.Code = @courseName;";
+                    "where c.Name = @courseName;";
 
-                command.Parameters.AddWithValue("@campusName", courseName);
+                command.Parameters.AddWithValue("@courseName", courseName);
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
