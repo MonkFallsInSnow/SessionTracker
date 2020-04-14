@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,14 @@ namespace SessionTracker.Modules.Data.Database
 
         public virtual int ExecuteCommand()
         {
-            return this.Command.Execute();
+            try
+            {
+                return this.Command.Execute();
+            }
+            catch (SQLiteException ex)
+            {
+                throw new SQLiteException(ex.Message);
+            }
         }
     }
 }

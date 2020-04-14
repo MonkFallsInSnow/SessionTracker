@@ -41,7 +41,21 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
-        public IEnumerable<NameValueCollection> GetTutorsByCampus(string campusName)
+        public IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereExpression)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(this.connection))
+            {
+                command.CommandText = $"select {columns} from {table} where {whereExpression}";
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        yield return reader.GetValues();
+                }
+            }
+        }
+
+        public IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
             {
@@ -62,87 +76,27 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
-        /*
-        public int GetReferenceID(string sourceTable, string referenceTable, string filterColumn, string filterValue)
+        public IEnumerable<NameValueCollection> SelectTopicsByCourse(string courseName)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
             {
-                command.CommandText = $"select ID from @referenceTable " +
-                    "join @referenceTable on @referenceTable.ID = @sourceTable.ID " +
-                    "where @sourceTable.@filterColumn = @filterValue;";
+                command.CommandText = "" +
+                    "select t.ID, t.Name " +
+                    "from Topic as t " +
+                    "join CourseTopic as ct " +
+                    "on t.ID = ct.TopicID " +
+                    "join Course as c " +
+                    "on ct.CourseID = c.ID " +
+                    "where c.Name = @courseName;";
 
-                command.Parameters.AddWithValue("@referenceTable", referenceTable);
-                command.Parameters.AddWithValue("@sourceTable", sourceTable);
-                command.Parameters.AddWithValue("@filterColumn", filterColumn);
-                command.Parameters.AddWithValue("@filterValue", filterValue);
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    return reader.GetInt32(0);
-                }
-            }
-        }
-        */
-        /*
-        public IList<object> GetCampuses()
-        {
-            IList<object> campuses = new BindingList<object>();
-
-            using (SQLiteCommand command = new SQLiteCommand(this.connection))
-            {
-                command.CommandText = "select ID, Name from Campus";
+                command.Parameters.AddWithValue("@courseName", courseName);
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
-                    {
-                        campuses.Add(new Campus(reader.GetInt32(0), reader.GetString(1)));
-                    }
+                        yield return reader.GetValues();
                 }
             }
-
-            return campuses;
         }
-
-        public IList<object> GetTutors()
-        {
-            IList<object> tutors = new BindingList<object>();
-
-            using (SQLiteCommand command = new SQLiteCommand(this.connection))
-            {
-                command.CommandText = "select ID, FName, Lname, IsActive from Tutor";
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        tutors.Add(new Tutor(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetBoolean(3)));
-                    }
-                }
-            }
-
-            return tutors;
-        }
-
-        public IList<object> GetTopics()
-        {
-            IList<object> topics = new BindingList<object>();
-
-            using (SQLiteCommand command = new SQLiteCommand(this.connection))
-            {
-                command.CommandText = "select ID, Description from Topic";
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        topics.Add(new Topic(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(0)));
-                    }
-                }
-            }
-
-            return topics;
-        }
-        */
     }
 }

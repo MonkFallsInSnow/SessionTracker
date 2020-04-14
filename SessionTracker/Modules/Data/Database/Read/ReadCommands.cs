@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
@@ -39,37 +40,60 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.GetTutorsByCampus(campusName);
+            return this.database.SelectTutorsByCampus(campusName);
             
         }
     }
 
-    class GetTopicsCommand : BaseReadCommand
+    class GetTopicsByCourseCommand : BaseReadCommand
     {
-        public GetTopicsCommand(IDatabase database) : base(database)
+        private string courseName;
+
+        public GetTopicsByCourseCommand(IDatabase database, string courseName) : base(database)
         {
+            this.courseName = courseName;
         }
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("ID, Description, CourseID", "Topic");
+            return this.database.SelectTopicsByCourse(courseName);
         }
+        
     }
 
     class GetReferenceIDCommand : BaseReadCommand
     {
-        private string column;
-        private string identifier;
+        private string table;
+        private string where;
+        private string value;
 
-        public GetReferenceIDCommand(IDatabase database, string column, string identifier) : base(database)
+        public GetReferenceIDCommand(IDatabase database, string table, string where, string value) : base(database)
         {
-            this.column = column;
-            this.identifier = identifier;
+            this.table = table;
+            this.where = where;
+            this.value = value;
         }
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("ID", column, "Name", identifier);
+            return this.database.QuickLookUp("ID", table, where, value);
+        }
+    }
+
+    class GetReferenceIDComplexCommand : BaseReadCommand
+    {
+        private string table;
+        private string whereExpression;
+
+        public GetReferenceIDComplexCommand(IDatabase database, string table, string whereExpression) : base(database)
+        {
+            this.table = table;
+            this.whereExpression = whereExpression;
+        }
+
+        public override IEnumerable<NameValueCollection> Execute()
+        {
+            return this.database.QuickLookUp("ID", table, whereExpression);
         }
     }
 
@@ -84,44 +108,8 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("seq", "sqlite_sequence", "name", table);
+            return this.database.QuickLookUp("seq", "sqlite_sequence", "Name", table);
         }
     }
-    /*
-    class GetCampusesCommand : BaseReadCommand
-    {
-        public GetCampusesCommand(IDatabase database) : base(database)
-        {
-        }
-
-        public override IList<object> Execute()
-        {
-            return this.database.GetCampuses();
-        }
-    }
-    
-    class GetTutorsCommand : BaseReadCommand
-    {
-        public GetTutorsCommand(IDatabase database) : base(database)
-        {
-        }
-
-        public override IList<object> Execute()
-        {
-            return this.database.GetTutors();
-        }
-    }
-
-    class GetTopicsCommand : BaseReadCommand
-    {
-        public GetTopicsCommand(IDatabase database) : base(database)
-        {
-        }
-
-        public override IList<object> Execute()
-        {
-            return this.database.GetTopics();
-        }
-    }
-    */
+   
 }
