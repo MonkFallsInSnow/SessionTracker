@@ -216,6 +216,10 @@ namespace SessionTracker
                     {
                         this.messageHandler.ShowDialog("Logging Error", "Failed to log session. Please try again.", MessageBoxIcon.Error);
                     }
+                    else
+                    {
+                        senderGrid.Rows.Remove(senderGrid.CurrentRow);
+                    }
                 }
                 catch(SQLiteException ex)
                 {
