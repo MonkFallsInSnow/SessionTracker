@@ -4,13 +4,10 @@ using SessionTracker.Modules.Data.Models;
 using SessionTracker.Modules.Messaging;
 using SessionTracker.Modules.Requests;
 using System;
-using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Data.SQLite;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SessionTracker
@@ -41,6 +38,8 @@ namespace SessionTracker
         private DatabaseReader dataReader;
         private DatabaseWriter dataWriter;
 
+        private bool canUpdate = true;
+
         public SessionTrackerMainForm(IDatabase database, IMessageHandler messageHandler, string cookie, Campus campus)
         {
             InitializeComponent();
@@ -60,6 +59,9 @@ namespace SessionTracker
 
         private void InitializeDataGridView()
         {
+            //fill columns & adjust width
+
+
             BindingList<SignInData> signIns = this.GetSignInData();
             BindingSource source = new BindingSource(signIns, null);
 
@@ -72,13 +74,13 @@ namespace SessionTracker
             }
 
             DataGridViewComboBoxColumn tutorSelectorColumn = new DataGridViewComboBoxColumn();
-            DataGridViewComboBoxColumn topicSelectorColumn = new DataGridViewComboBoxColumn();
-            DataGridViewColumn notesColumn = new DataGridViewColumn();
-            DataGridViewButtonColumn logButtonColumn = new DataGridViewButtonColumn();
+            tutorSelectorColumn.DisplayMember = "FullName";
+            tutorSelectorColumn.ValueMember = "ID";
 
             this.dataReader.Command = new GetTutorsByCampusCommand(this.database, this.activeCampus.Name);
             BindingList<Tutor> tutors = new BindingList<Tutor>();
-            foreach(var item in this.dataReader.ExecuteCommand())
+
+            foreach (NameValueCollection item in this.dataReader.ExecuteCommand())
             {
                 tutors.Add(
                     new Tutor(
@@ -90,31 +92,34 @@ namespace SessionTracker
                 );
             }
 
-            tutorSelectorColumn.DataSource = tutors;
-            tutorSelectorColumn.HeaderText = "Tutors";
+            source = new BindingSource(tutors, null);
+            tutorSelectorColumn.DataSource = source;
+            tutorSelectorColumn.Name = "Tutor";
+            tutorSelectorColumn.HeaderText = tutorSelectorColumn.Name;
             sessionDataGridView.Columns.Add(tutorSelectorColumn);
 
-            this.dataReader.Command = new GetTopicsCommand(this.database);
-            BindingList<Topic> topics = new BindingList<Topic>();
-            foreach(var item in this.dataReader.ExecuteCommand())
-            {
-                topics.Add(
-                    new Topic(
-                        Convert.ToInt32(item["ID"]),
-                        item["Description"],
-                        Convert.ToInt32(item["CourseID"])
-                    )
-                );
-            }
-
-            topicSelectorColumn.DataSource = topics;
-            topicSelectorColumn.HeaderText = "Topics";
+            DataGridViewTextBoxColumn topicSelectorColumn = new DataGridViewTextBoxColumn();
+            topicSelectorColumn.Name = "Topics";
+            topicSelectorColumn.HeaderText = topicSelectorColumn.Name;
+            topicSelectorColumn.ReadOnly = true;
+            topicSelectorColumn.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
             sessionDataGridView.Columns.Add(topicSelectorColumn);
 
-            notesColumn.HeaderText = "Notes";
-            notesColumn.CellTemplate = new DataGridViewTextBoxCell();
+            DataGridViewTextBoxColumn notesColumn = new DataGridViewTextBoxColumn();
+            notesColumn.Name = "Notes";
+            notesColumn.HeaderText = notesColumn.Name;
             sessionDataGridView.Columns.Add(notesColumn);
 
+            DataGridViewCheckBoxColumn isWorkshopColumn = new DataGridViewCheckBoxColumn();
+            isWorkshopColumn.FalseValue = false;
+            isWorkshopColumn.TrueValue = true;
+            isWorkshopColumn.IndeterminateValue = false;
+            isWorkshopColumn.Name = "IsWorkshop";
+            isWorkshopColumn.HeaderText = isWorkshopColumn.Name;
+            sessionDataGridView.Columns.Add(isWorkshopColumn);
+
+            DataGridViewButtonColumn logButtonColumn = new DataGridViewButtonColumn();
+            logButtonColumn.Name = "LogBtns";
             logButtonColumn.Text = "Log";
             logButtonColumn.UseColumnTextForButtonValue = true;
             sessionDataGridView.Columns.Add(logButtonColumn);
@@ -135,6 +140,39 @@ namespace SessionTracker
             return requestHandler.MakeRequest(LogDataURL, payload);
         }
 
+        private NameValueCollection CreateSession(SignInData data, DataGridViewCellCollection cells)
+        {
+            this.dataReader.Command = new GetLastInsertedRowIDCommand(this.database, "Session");
+            NameValueCollection sessionData = new NameValueCollection();
+
+            var id = this.dataReader.ExecuteCommand().FirstOrDefault();
+            string sessionID = id == null ? "0" : id[0];
+
+            sessionData.Add("ID", sessionID);
+            sessionData.Add("StudentID", data.StudentID);
+            sessionData.Add("Timestamp", data.Timestamp.ToString());
+            sessionData.Add("Notes", cells["Notes"].Value.ToString());
+            sessionData.Add("IsWorkshop", Convert.ToBoolean(cells["IsWorkshop"].Value).ToString());
+
+            
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Campus", "Name", cells["Campus"].Value.ToString());
+            string campusID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("CampusID", campusID);
+
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", "Name", cells["Course"].Value.ToString());
+            string courseID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("courseID", courseID);
+
+            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", "Name", cells["Center"].Value.ToString());
+            string centerID = this.dataReader.ExecuteCommand().First()[0];
+            sessionData.Add("centerID", centerID);
+
+            sessionData.Add("tutorID", cells["Tutor"].Value.ToString());
+            sessionData.Add("topics", cells["Topics"].Value.ToString());
+            
+            return sessionData;
+        }
+
         private void StartWorker(Object obj, EventArgs e)
         {
             this.eventTimer.Stop();
@@ -148,7 +186,14 @@ namespace SessionTracker
 
         private void getSignInDataWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            if(canUpdate)
+            {
+                //update dgv
+            }
+            else
+            {
+                //update data buffer
+            }
         }
         
         private void sessionDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -159,39 +204,92 @@ namespace SessionTracker
             {
                 SignInData data = (SignInData)senderGrid.CurrentRow.DataBoundItem;
                 DataGridViewCellCollection cells = senderGrid.CurrentRow.Cells;
-                Session session = CreateSession(data, cells);
+                NameValueCollection session = CreateSession(data, cells);
 
+                this.dataWriter.Command = new LogSessionCommand(this.database, session);
 
-
-            }
+                try
+                {
+                    int rowsInserted = this.dataWriter.ExecuteCommand();
+                    
+                    if(rowsInserted == 0)
+                    {
+                        this.messageHandler.ShowDialog("Logging Error", "Failed to log session. Please try again.", MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        senderGrid.Rows.Remove(senderGrid.CurrentRow);
+                    }
+                }
+                catch(SQLiteException ex)
+                {
+                    this.messageHandler.ShowDialog("Database Error", ex.Message, MessageBoxIcon.Error);
+                }
+            } 
         }
 
-        private Session CreateSession(SignInData data, DataGridViewCellCollection cells)
+        private void sessionDataGridView_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
-            this.dataReader.Command = new GetLastInsertedRowIDCommand(this.database, "Session");
-            Session session = new Session(Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]));
+            this.canUpdate = false;
+        }
 
-            session.StudentID = data.StudentID;
-            session.Timestamp = data.Timestamp;
-            session.Notes = cells["Notes"].Value.ToString();
-            session.IsWorkshop = Convert.ToBoolean(cells["IsWorkshop"].Value);
+        private void sessionDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            this.canUpdate = true;
 
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Campus", cells["Campus"].Value.ToString());
-            session.CampusID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+            //TODO: get data from buffer and update dgv
+        }
 
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", cells["Course"].Value.ToString());
-            session.CourseID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+        private void sessionDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView senderGrid = (DataGridView)sender;
 
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", cells["Center"].Value.ToString());
-            session.CenterID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+            if (senderGrid.Columns[e.ColumnIndex].Name == "Topics" && e.RowIndex >= 0 && senderGrid.Columns[e.ColumnIndex] is DataGridViewTextBoxColumn)
+            {
+                //TODO: add error handing
+                string courseName = senderGrid.CurrentRow.Cells["Course"].Value.ToString();
 
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Tutor", cells["Tutor"].Value.ToString());
-            session.TutorID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+                this.dataReader.Command = new GetTopicsByCourseCommand(this.database, courseName);
+                BindingList<Topic> topics = new BindingList<Topic>();
 
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Topic", cells["Topic"].Value.ToString());
-            session.TopicID = Convert.ToInt32(this.dataReader.ExecuteCommand().First()[0]);
+                foreach (var item in this.dataReader.ExecuteCommand())
+                {
+                    topics.Add(
+                        new Topic(
+                            Convert.ToInt32(item["ID"]),
+                            item["Name"]
+                        )
+                    );
+                }
 
-            return session;
+                TopicSelectorDialog topicSelectorDialog = new TopicSelectorDialog(topics);
+
+                if(topicSelectorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    if (topicSelectorDialog.SelectedTopics.Count > 0)
+                    {
+                        string topicsDisplay = "";
+
+                        foreach (Topic topic in topicSelectorDialog.SelectedTopics)
+                        {
+                            topicsDisplay += $"{topic.ToString()}, ";
+                        }
+
+                        //TODO: create topic list class that mimics this functionality
+                        topicsDisplay = topicsDisplay.TrimEnd(',', ' ');
+                        senderGrid.CurrentCell.Value = topicsDisplay;
+
+                    }
+                    else
+                    {
+                        senderGrid.CurrentCell.Value = null;
+                    }
+
+                    topicSelectorDialog.ClearSelectedTopics();
+                    senderGrid.Refresh();
+
+                }
+            }
         }
     }
 }

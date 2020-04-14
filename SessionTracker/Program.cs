@@ -28,7 +28,8 @@ namespace SessionTracker
 
             using (IDatabase database = new Database("database.sqlite", messageHandler))
             {
-                database.Connection.Open();
+                if(database.Connection.State == System.Data.ConnectionState.Closed)
+                    database.Connection.Open();
 
                 IRequestHandler<string, NameValueCollection> loginRequestHandler = new LoginRequest(messageHandler);
                 IRequestHandler<BindingList<SignInData>, DataRequestPayload> dataRequestHandler = new DataRequest(messageHandler);

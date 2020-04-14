@@ -1,5 +1,7 @@
 ﻿using SessionTracker.Modules.Messaging;
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Windows.Forms;
 
@@ -35,12 +37,14 @@ namespace SessionTracker.Modules.Data.Database
 
             if (System.IO.File.Exists(databaseName))
             {
-                System.IO.FileStream dbFile = System.IO.File.OpenRead(databaseName);
-
-                if (dbFile.Length == 0)
+                using (System.IO.FileStream dbFile = System.IO.File.OpenRead(databaseName))
                 {
-                    dbFile.Dispose();
-                    this.CreateTables();
+
+                    if (dbFile.Length == 0)
+                    {
+                        dbFile.Dispose();
+                        this.CreateTables();
+                    }
                 }
             }
             else

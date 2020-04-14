@@ -29,19 +29,23 @@
         private void InitializeComponent()
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.sessionsTab = new System.Windows.Forms.TabPage();
             this.sessionDataGridView = new System.Windows.Forms.DataGridView();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.editTab = new System.Windows.Forms.TabPage();
             this.getSessionDataWorker = new System.ComponentModel.BackgroundWorker();
+            this.portalTab = new System.Windows.Forms.TabPage();
+            this.webBrowser = new System.Windows.Forms.WebBrowser();
             this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.sessionsTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sessionDataGridView)).BeginInit();
+            this.portalTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.sessionsTab);
+            this.tabControl1.Controls.Add(this.editTab);
+            this.tabControl1.Controls.Add(this.portalTab);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
@@ -49,19 +53,21 @@
             this.tabControl1.Size = new System.Drawing.Size(681, 450);
             this.tabControl1.TabIndex = 0;
             // 
-            // tabPage1
+            // sessionsTab
             // 
-            this.tabPage1.Controls.Add(this.sessionDataGridView);
-            this.tabPage1.Location = new System.Drawing.Point(4, 25);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(673, 421);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "tabPage1";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.sessionsTab.Controls.Add(this.sessionDataGridView);
+            this.sessionsTab.Location = new System.Drawing.Point(4, 25);
+            this.sessionsTab.Name = "sessionsTab";
+            this.sessionsTab.Padding = new System.Windows.Forms.Padding(3);
+            this.sessionsTab.Size = new System.Drawing.Size(673, 421);
+            this.sessionsTab.TabIndex = 0;
+            this.sessionsTab.Text = "Sessions";
+            this.sessionsTab.UseVisualStyleBackColor = true;
             // 
             // sessionDataGridView
             // 
+            this.sessionDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.sessionDataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.sessionDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.sessionDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.sessionDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
@@ -70,21 +76,45 @@
             this.sessionDataGridView.RowTemplate.Height = 24;
             this.sessionDataGridView.Size = new System.Drawing.Size(667, 415);
             this.sessionDataGridView.TabIndex = 0;
+            this.sessionDataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.sessionDataGridView_CellBeginEdit);
+            this.sessionDataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.sessionDataGridView_CellClick);
             this.sessionDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.sessionDataGridView_CellContentClick);
+            this.sessionDataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.sessionDataGridView_CellEndEdit);
             // 
-            // tabPage2
+            // editTab
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(673, 421);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.editTab.Location = new System.Drawing.Point(4, 25);
+            this.editTab.Name = "editTab";
+            this.editTab.Padding = new System.Windows.Forms.Padding(3);
+            this.editTab.Size = new System.Drawing.Size(673, 421);
+            this.editTab.TabIndex = 1;
+            this.editTab.Text = "Edit";
+            this.editTab.UseVisualStyleBackColor = true;
             // 
             // getSessionDataWorker
             // 
             this.getSessionDataWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.getSessionDataWorker_DoWork);
+            // 
+            // portalTab
+            // 
+            this.portalTab.Controls.Add(this.webBrowser);
+            this.portalTab.Location = new System.Drawing.Point(4, 25);
+            this.portalTab.Name = "portalTab";
+            this.portalTab.Size = new System.Drawing.Size(673, 421);
+            this.portalTab.TabIndex = 2;
+            this.portalTab.Text = "Portal";
+            this.portalTab.UseVisualStyleBackColor = true;
+            // 
+            // webBrowser
+            // 
+            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser.Location = new System.Drawing.Point(0, 0);
+            this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser.Name = "webBrowser";
+            this.webBrowser.ScriptErrorsSuppressed = true;
+            this.webBrowser.Size = new System.Drawing.Size(673, 421);
+            this.webBrowser.TabIndex = 0;
+            this.webBrowser.Url = new System.Uri("https://ilctimetrk.waketech.edu/admin", System.UriKind.Absolute);
             // 
             // SessionTrackerMainForm
             // 
@@ -95,8 +125,9 @@
             this.Name = "SessionTrackerMainForm";
             this.Text = "Form1";
             this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
+            this.sessionsTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.sessionDataGridView)).EndInit();
+            this.portalTab.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -104,10 +135,12 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage sessionsTab;
+        private System.Windows.Forms.TabPage editTab;
         private System.ComponentModel.BackgroundWorker getSessionDataWorker;
         private System.Windows.Forms.DataGridView sessionDataGridView;
+        private System.Windows.Forms.TabPage portalTab;
+        private System.Windows.Forms.WebBrowser webBrowser;
     }
 }
 
