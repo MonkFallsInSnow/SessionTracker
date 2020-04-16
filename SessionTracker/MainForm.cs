@@ -4,6 +4,7 @@ using SessionTracker.Modules.Data.Models;
 using SessionTracker.Modules.Messaging;
 using SessionTracker.Modules.Requests;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SQLite;
@@ -14,6 +15,7 @@ namespace SessionTracker
 {
     public partial class SessionTrackerMainForm : Form
     {
+        /*
         private struct WorkerResult
         {
             public readonly BindingList<SignInData> SignInData;
@@ -25,6 +27,7 @@ namespace SessionTracker
                 this.SelectedRowIndex = index;
             }
         }
+        */
 
         private static readonly string LogDataURL = @"https://ilctimetrk.waketech.edu/admin/live-status?_=";
         private static readonly int DataRequestInterval = 30000;
@@ -39,6 +42,7 @@ namespace SessionTracker
         private DatabaseWriter dataWriter;
 
         private bool canUpdate = true;
+        private IList<SignInData> signInDataBuffer;
 
         public SessionTrackerMainForm(IDatabase database, IMessageHandler messageHandler, string cookie, Campus campus)
         {
@@ -50,6 +54,7 @@ namespace SessionTracker
             this.messageHandler = messageHandler;
             this.dataReader = new DatabaseReader();
             this.dataWriter = new DatabaseWriter();
+            this.signInDataBuffer = new BindingList<SignInData>();
 
             this.Text = $"Session Tracker - {this.activeCampus.Name}";
 
@@ -129,7 +134,7 @@ namespace SessionTracker
         {
             this.eventTimer = new Timer();
             this.eventTimer.Interval = DataRequestInterval;
-            this.eventTimer.Tick += StartWorker;
+            this.eventTimer.Tick += UpdateSignInData;
             this.eventTimer.Start();
         }
 
@@ -151,6 +156,8 @@ namespace SessionTracker
             sessionData.Add("ID", sessionID);
             sessionData.Add("StudentID", data.StudentID);
             sessionData.Add("Timestamp", data.Timestamp.ToString());
+            sessionData.Add("FName", data.FName);
+            sessionData.Add("LName", data.LName);
             sessionData.Add("Notes", cells["Notes"].Value.ToString());
             sessionData.Add("IsWorkshop", Convert.ToBoolean(cells["IsWorkshop"].Value).ToString());
 
@@ -173,7 +180,7 @@ namespace SessionTracker
             return sessionData;
         }
 
-        private void StartWorker(Object obj, EventArgs e)
+        private void UpdateSignInData(Object obj, EventArgs e)
         {
             this.eventTimer.Stop();
             getSessionDataWorker.RunWorkerAsync();
@@ -181,19 +188,49 @@ namespace SessionTracker
 
         private void getSessionDataWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-
+            e.Result = this.GetSignInData();                           
         }
 
         private void getSignInDataWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if(canUpdate)
             {
-                //update dgv
+                var rows = sessionDataGridView.Rows;
+                IList<SignInData> currentSignInData = new List<SignInData>();
+
+                foreach(DataGridViewRow row in rows)
+                {
+                    currentSignInData.Add((SignInData)row.DataBoundItem);
+                }
+
+                foreach(SignInData element in (BindingList<SignInData>)e.Result)
+                {
+                    if(!currentSignInData.Contains(element))
+                    {
+                        BindingSource source = (BindingSource)sessionDataGridView.DataSource;
+                        ((BindingList<SignInData>)source.DataSource).Add(element);
+                    }
+                }
+
+                if(this.signInDataBuffer.Count > 0)
+                {
+                    foreach (SignInData element in this.signInDataBuffer)
+                    {
+                        if (!this.signInDataBuffer.Contains(element))
+                        {
+                            ((BindingList<SignInData>)sessionDataGridView.DataSource).Add(element);
+                        }
+                    }
+                }
             }
             else
             {
-                //update data buffer
+                foreach (SignInData element in (BindingList<SignInData>)e.Result)
+                    if(!this.signInDataBuffer.Contains(element))
+                        this.signInDataBuffer.Add(element);
             }
+
+            this.eventTimer.Start();
         }
         
         private void sessionDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -247,6 +284,7 @@ namespace SessionTracker
             if (senderGrid.Columns[e.ColumnIndex].Name == "Topics" && e.RowIndex >= 0 && senderGrid.Columns[e.ColumnIndex] is DataGridViewTextBoxColumn)
             {
                 //TODO: add error handing
+                //TODO: format course name to remove section code
                 string courseName = senderGrid.CurrentRow.Cells["Course"].Value.ToString();
 
                 this.dataReader.Command = new GetTopicsByCourseCommand(this.database, courseName);

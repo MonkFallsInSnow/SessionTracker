@@ -32,9 +32,9 @@
             this.sessionsTab = new System.Windows.Forms.TabPage();
             this.sessionDataGridView = new System.Windows.Forms.DataGridView();
             this.editTab = new System.Windows.Forms.TabPage();
-            this.getSessionDataWorker = new System.ComponentModel.BackgroundWorker();
             this.portalTab = new System.Windows.Forms.TabPage();
             this.webBrowser = new System.Windows.Forms.WebBrowser();
+            this.getSessionDataWorker = new System.ComponentModel.BackgroundWorker();
             this.tabControl1.SuspendLayout();
             this.sessionsTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sessionDataGridView)).BeginInit();
@@ -91,10 +91,6 @@
             this.editTab.Text = "Edit";
             this.editTab.UseVisualStyleBackColor = true;
             // 
-            // getSessionDataWorker
-            // 
-            this.getSessionDataWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.getSessionDataWorker_DoWork);
-            // 
             // portalTab
             // 
             this.portalTab.Controls.Add(this.webBrowser);
@@ -115,6 +111,11 @@
             this.webBrowser.Size = new System.Drawing.Size(673, 421);
             this.webBrowser.TabIndex = 0;
             this.webBrowser.Url = new System.Uri("https://ilctimetrk.waketech.edu/admin", System.UriKind.Absolute);
+            // 
+            // getSessionDataWorker
+            // 
+            this.getSessionDataWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.getSessionDataWorker_DoWork);
+            this.getSessionDataWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.getSignInDataWorker_RunWorkerCompleted);
             // 
             // SessionTrackerMainForm
             // 

@@ -121,8 +121,7 @@ namespace SessionTracker.Modules.Data.Models
             return this.StudentID == data.studentID &&
                 this.FName == data.FName &&
                 this.LName == data.FName &&
-                this.Course == data.Course &&
-                this.Timestamp.Day == data.Timestamp.Day;
+                this.Course == data.Course;
         }
     }
 }
