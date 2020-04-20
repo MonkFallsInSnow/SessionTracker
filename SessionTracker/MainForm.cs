@@ -15,20 +15,6 @@ namespace SessionTracker
 {
     public partial class SessionTrackerMainForm : Form
     {
-        /*
-        private struct WorkerResult
-        {
-            public readonly BindingList<SignInData> SignInData;
-            public readonly int SelectedRowIndex;
-
-            public WorkerResult(BindingList<SignInData> data, int index)
-            {
-                this.SignInData = data;
-                this.SelectedRowIndex = index;
-            }
-        }
-        */
-
         private static readonly string LogDataURL = @"https://ilctimetrk.waketech.edu/admin/live-status?_=";
         private static readonly int DataRequestInterval = 30000;
 
@@ -43,6 +29,7 @@ namespace SessionTracker
 
         private bool canUpdate = true;
         private IList<SignInData> signInDataBuffer;
+        private HashSet<SignInData> loggedSessionCache;
 
         public SessionTrackerMainForm(IDatabase database, IMessageHandler messageHandler, string cookie, Campus campus)
         {
@@ -55,7 +42,8 @@ namespace SessionTracker
             this.dataReader = new DatabaseReader();
             this.dataWriter = new DatabaseWriter();
             this.signInDataBuffer = new BindingList<SignInData>();
-
+            this.loggedSessionCache = new HashSet<SignInData>();
+            
             this.Text = $"Session Tracker - {this.activeCampus.Name}";
 
             this.InitializeDataGridView();
@@ -64,9 +52,6 @@ namespace SessionTracker
 
         private void InitializeDataGridView()
         {
-            //fill columns & adjust width
-
-
             BindingList<SignInData> signIns = this.GetSignInData();
             BindingSource source = new BindingSource(signIns, null);
 
@@ -151,7 +136,7 @@ namespace SessionTracker
             NameValueCollection sessionData = new NameValueCollection();
 
             var id = this.dataReader.ExecuteCommand().FirstOrDefault();
-            string sessionID = id == null ? "0" : id[0];
+            string sessionID = id == null ? "0" : (Convert.ToInt32(id[0]) + 1).ToString();
 
             sessionData.Add("ID", sessionID);
             sessionData.Add("StudentID", data.StudentID);
@@ -168,14 +153,14 @@ namespace SessionTracker
 
             this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", "Name", cells["Course"].Value.ToString());
             string courseID = this.dataReader.ExecuteCommand().First()[0];
-            sessionData.Add("courseID", courseID);
+            sessionData.Add("CourseID", courseID);
 
             this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", "Name", cells["Center"].Value.ToString());
             string centerID = this.dataReader.ExecuteCommand().First()[0];
-            sessionData.Add("centerID", centerID);
+            sessionData.Add("CenterID", centerID);
 
-            sessionData.Add("tutorID", cells["Tutor"].Value.ToString());
-            sessionData.Add("topics", cells["Topics"].Value.ToString());
+            sessionData.Add("TutorID", cells["Tutor"].Value.ToString());
+            sessionData.Add("Topics", cells["Topics"].Value.ToString());
             
             return sessionData;
         }
@@ -191,6 +176,7 @@ namespace SessionTracker
             e.Result = this.GetSignInData();                           
         }
 
+        //TODO: Filter out sessions that have already been logged.
         private void getSignInDataWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if(canUpdate)
@@ -205,7 +191,7 @@ namespace SessionTracker
 
                 foreach(SignInData element in (BindingList<SignInData>)e.Result)
                 {
-                    if(!currentSignInData.Contains(element))
+                    if(!currentSignInData.Contains(element) && !IsLogged(element))
                     {
                         BindingSource source = (BindingSource)sessionDataGridView.DataSource;
                         ((BindingList<SignInData>)source.DataSource).Add(element);
@@ -218,7 +204,7 @@ namespace SessionTracker
                     {
                         if (!this.signInDataBuffer.Contains(element))
                         {
-                            ((BindingList<SignInData>)sessionDataGridView.DataSource).Add(element);
+                            ((BindingSource)sessionDataGridView.DataSource).List.Add(element);
                         }
                     }
                 }
@@ -232,7 +218,13 @@ namespace SessionTracker
 
             this.eventTimer.Start();
         }
-        
+
+        private bool IsLogged(SignInData element)
+        {
+            return this.loggedSessionCache.Contains(element);
+
+        }
+
         private void sessionDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             DataGridView senderGrid = (DataGridView)sender;
@@ -255,6 +247,7 @@ namespace SessionTracker
                     }
                     else
                     {
+                        this.loggedSessionCache.Add(data);
                         senderGrid.Rows.Remove(senderGrid.CurrentRow);
                     }
                 }
@@ -273,8 +266,6 @@ namespace SessionTracker
         private void sessionDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             this.canUpdate = true;
-
-            //TODO: get data from buffer and update dgv
         }
 
         private void sessionDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -284,7 +275,6 @@ namespace SessionTracker
             if (senderGrid.Columns[e.ColumnIndex].Name == "Topics" && e.RowIndex >= 0 && senderGrid.Columns[e.ColumnIndex] is DataGridViewTextBoxColumn)
             {
                 //TODO: add error handing
-                //TODO: format course name to remove section code
                 string courseName = senderGrid.CurrentRow.Cells["Course"].Value.ToString();
 
                 this.dataReader.Command = new GetTopicsByCourseCommand(this.database, courseName);
@@ -313,7 +303,6 @@ namespace SessionTracker
                             topicsDisplay += $"{topic.ToString()}, ";
                         }
 
-                        //TODO: create topic list class that mimics this functionality
                         topicsDisplay = topicsDisplay.TrimEnd(',', ' ');
                         senderGrid.CurrentCell.Value = topicsDisplay;
 

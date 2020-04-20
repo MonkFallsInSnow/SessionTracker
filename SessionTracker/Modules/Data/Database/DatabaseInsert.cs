@@ -82,14 +82,19 @@ namespace SessionTracker.Modules.Data.Database
         private int AddStudent(NameValueCollection session, SQLiteCommand command)
         {
             int rowCount = 0;
+            StringBuilder sb = new StringBuilder();
             var result = this.QuickLookUp("StudentID", "Student").FirstOrDefault();
 
             if (result == null)
             {
-                command.CommandText = "insert into Student (StudentID, FName, LName) values (" +
-                    session["StudentID"] + ", " + session["FName"] + ", " + session["LName"] + ");";
+                sb.Append("insert into Student (StudentID, FName, LName) values (");
+                sb.Append("\"" + session["StudentID"] + "\", ");
+                sb.Append("\"" + session["FName"] + "\", ");
+                sb.Append("\"" + session["LName"] + "\"");
+                sb.Append(");");
 
-                rowCount = command.ExecuteNonQuery()
+                command.CommandText = sb.ToString();
+                rowCount = command.ExecuteNonQuery();
             }
 
             return rowCount;

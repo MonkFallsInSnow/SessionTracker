@@ -120,7 +120,7 @@ namespace SessionTracker.Modules.Data.Models
 
             return this.StudentID == data.studentID &&
                 this.FName == data.FName &&
-                this.LName == data.FName &&
+                this.LName == data.LName &&
                 this.Course == data.Course;
         }
     }
