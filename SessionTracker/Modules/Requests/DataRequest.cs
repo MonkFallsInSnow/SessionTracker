@@ -91,6 +91,8 @@ namespace SessionTracker.Modules.Requests
 
         private SignInData BuildDataRow(JToken element, Campus campus)
         {
+            const string WORK_INDEPENDENT = "Wrk-Independent";
+
             string currentCampusName = element[(int)JsonDataIndex.Campus].ToString();
 
             if (!string.IsNullOrEmpty(currentCampusName))
@@ -99,6 +101,8 @@ namespace SessionTracker.Modules.Requests
                 if (currentCampusName == campus.Name)
                 {
                     Tuple<string, string> name = this.ParseName(element[(int)JsonDataIndex.StudentName].ToString());
+                    string course = element[(int)JsonDataIndex.Course].ToString() == WORK_INDEPENDENT ?
+                        WORK_INDEPENDENT : element[(int)JsonDataIndex.Course].ToString().Substring(0, 7);
 
                     return new SignInData(
                         element[(int)JsonDataIndex.Center].ToString(),
@@ -106,7 +110,7 @@ namespace SessionTracker.Modules.Requests
                         this.ExtractStudentID(element[(int)JsonDataIndex.StudentID].ToString()),
                         name.Item2,
                         name.Item1,
-                        element[(int)JsonDataIndex.Course].ToString()
+                        course
                     );
                 }
             }
