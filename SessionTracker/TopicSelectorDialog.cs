@@ -36,5 +36,21 @@ namespace SessionTracker
         {
             this.SelectedTopics.Clear();
         }
+
+        private void topicsAddBtn_Click(object sender, EventArgs e)
+        {
+            this.Width += 50;
+
+        }
+
+        private void topicsExpandPanelBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void topicsCollapsePanelBtn_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
