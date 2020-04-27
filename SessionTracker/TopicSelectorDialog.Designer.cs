@@ -36,15 +36,15 @@
             this.topicsCollapsePanelBtn = new System.Windows.Forms.Button();
             this.topicsExpandPanelBtn = new System.Windows.Forms.Button();
             this.topicsLabel = new System.Windows.Forms.Label();
+            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.topicsCourseTopicsListBox = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.topicsCourseListBox = new System.Windows.Forms.ListBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.topicsAddInstructionsLabel = new System.Windows.Forms.Label();
-            this.topicsCourseTopicsListBox = new System.Windows.Forms.ListBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             ((System.ComponentModel.ISupportInitialize)(this.topicsSplitContainer)).BeginInit();
             this.topicsSplitContainer.Panel1.SuspendLayout();
             this.topicsSplitContainer.Panel2.SuspendLayout();
@@ -117,8 +117,9 @@
             this.topicsSplitContainer.Panel2.Controls.Add(this.textBox1);
             this.topicsSplitContainer.Panel2.Controls.Add(this.topicsAddInstructionsLabel);
             this.topicsSplitContainer.Panel2.Controls.Add(this.topicsAddBtn);
-            this.topicsSplitContainer.Size = new System.Drawing.Size(719, 533);
-            this.topicsSplitContainer.SplitterDistance = 291;
+            this.topicsSplitContainer.Panel2Collapsed = true;
+            this.topicsSplitContainer.Size = new System.Drawing.Size(282, 533);
+            this.topicsSplitContainer.SplitterDistance = 114;
             this.topicsSplitContainer.TabIndex = 4;
             // 
             // topicsCollapsePanelBtn
@@ -150,6 +151,51 @@
             this.topicsLabel.Size = new System.Drawing.Size(50, 17);
             this.topicsLabel.TabIndex = 2;
             this.topicsLabel.Text = "Topics";
+            // 
+            // checkedListBox1
+            // 
+            this.checkedListBox1.FormattingEnabled = true;
+            this.checkedListBox1.Location = new System.Drawing.Point(24, 353);
+            this.checkedListBox1.Name = "checkedListBox1";
+            this.checkedListBox1.Size = new System.Drawing.Size(388, 89);
+            this.checkedListBox1.TabIndex = 8;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(24, 448);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 13;
+            this.button2.Text = "Remove";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(21, 321);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(265, 17);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "Select a topic to remove from this course";
+            // 
+            // button1
+            // 
+            this.button1.AutoSize = true;
+            this.button1.Location = new System.Drawing.Point(24, 269);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 27);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Copy";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // topicsCourseTopicsListBox
+            // 
+            this.topicsCourseTopicsListBox.FormattingEnabled = true;
+            this.topicsCourseTopicsListBox.ItemHeight = 16;
+            this.topicsCourseTopicsListBox.Location = new System.Drawing.Point(245, 179);
+            this.topicsCourseTopicsListBox.Name = "topicsCourseTopicsListBox";
+            this.topicsCourseTopicsListBox.Size = new System.Drawing.Size(167, 84);
+            this.topicsCourseTopicsListBox.TabIndex = 9;
             // 
             // label2
             // 
@@ -186,58 +232,14 @@
             this.topicsAddInstructionsLabel.TabIndex = 4;
             this.topicsAddInstructionsLabel.Text = "Enter topics to add in a comma separated list";
             // 
-            // topicsCourseTopicsListBox
-            // 
-            this.topicsCourseTopicsListBox.FormattingEnabled = true;
-            this.topicsCourseTopicsListBox.ItemHeight = 16;
-            this.topicsCourseTopicsListBox.Location = new System.Drawing.Point(245, 179);
-            this.topicsCourseTopicsListBox.Name = "topicsCourseTopicsListBox";
-            this.topicsCourseTopicsListBox.Size = new System.Drawing.Size(167, 84);
-            this.topicsCourseTopicsListBox.TabIndex = 9;
-            // 
-            // button1
-            // 
-            this.button1.AutoSize = true;
-            this.button1.Location = new System.Drawing.Point(24, 269);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 27);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "Copy";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(21, 321);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(265, 17);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "Select a topic to remove from this course";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(24, 448);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 13;
-            this.button2.Text = "Remove";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // checkedListBox1
-            // 
-            this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(24, 353);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(388, 89);
-            this.checkedListBox1.TabIndex = 8;
-            // 
             // TopicSelectorDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(719, 533);
+            this.ClientSize = new System.Drawing.Size(282, 533);
             this.Controls.Add(this.topicsSplitContainer);
             this.Name = "TopicSelectorDialog";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Course Topics";
             this.topicsSplitContainer.Panel1.ResumeLayout(false);
             this.topicsSplitContainer.Panel1.PerformLayout();

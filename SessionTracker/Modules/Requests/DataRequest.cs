@@ -71,8 +71,8 @@ namespace SessionTracker.Modules.Requests
                             foreach (var element in json[JsonDataKey])
                             {
                                 SignInData row = this.BuildDataRow(element, data.Campus);
-
-                                if (row != null)
+                                
+                                if (!(row is null))
                                 {
                                     logData.Add(row);
                                 }

@@ -14,11 +14,17 @@ namespace SessionTracker
 {
     public partial class TopicSelectorDialog : Form
     {
+        private const int CONTROL_WIDTH_COLLAPSED = 300;
+        private const int CONTROL_WIDTH_EXPANDED = 740;
+        private const int CONTROL_HEIGHT = 580;
+
         public IList<Topic> SelectedTopics { get; private set; }
 
         public TopicSelectorDialog(BindingList<Topic> topics)
         {
             InitializeComponent();
+            this.Height = CONTROL_HEIGHT;
+
             this.SelectedTopics = new List<Topic>();
             BindingSource source = new BindingSource(topics, null);
             topicsCheckedListBox.DataSource = source;
@@ -45,12 +51,15 @@ namespace SessionTracker
 
         private void topicsExpandPanelBtn_Click(object sender, EventArgs e)
         {
-
+            topicsSplitContainer.Panel2Collapsed = false;
+            this.Width = CONTROL_WIDTH_EXPANDED;
+                      
         }
 
         private void topicsCollapsePanelBtn_Click(object sender, EventArgs e)
         {
-
+            topicsSplitContainer.Panel2Collapsed = true;
+            this.Width = CONTROL_WIDTH_COLLAPSED;
         }
     }
 }
