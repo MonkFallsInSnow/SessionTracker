@@ -12,6 +12,29 @@ namespace SessionTracker.Modules.Data.Database
 {
     partial class Database
     {
+        //use this and make sure none of the literals in the commandText are supplied by the user via the UI
+        internal IEnumerable<NameValueCollection>Select(string commandText, Dictionary<string, string> parameters = null)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(this.connection))
+            {
+                command.CommandText = commandText;
+
+                if(parameters != null)
+                {
+                    foreach (KeyValuePair<string, string> kvp in parameters)
+                    {
+                        command.Parameters.AddWithValue(kvp.Key, kvp.Value);
+                    }
+                }
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        yield return reader.GetValues();
+                }
+            }
+        }
+
         public IEnumerable<NameValueCollection> QuickLookUp(string columns, string table)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
@@ -41,6 +64,7 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
+        //not safe from sql injection. whereExpression param is vulnerable
         public IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereExpression)
         {
             using (SQLiteCommand command = new SQLiteCommand(this.connection))
