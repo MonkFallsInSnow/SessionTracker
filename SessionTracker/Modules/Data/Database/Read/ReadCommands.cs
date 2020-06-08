@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace SessionTracker.Modules.Data.Database
 {
+    /*
     abstract class BaseReadCommand : IDatabaseReadCommand
     {
         protected readonly IDatabase database;
@@ -25,7 +26,8 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("ID, Name", "Campus");
+            string queryCommand = "select ID, Name from Campus";
+            return this.database.Read(queryCommand);//this.database.QuickLookUp("ID, Name", "Campus");
         }
     }
 
@@ -76,7 +78,13 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("ID", table, where, value);
+            string queryCommand = $"select ID, from {table} where {where} = @value";
+            Dictionary<string, string> parameters = new Dictionary<string, string>()
+            {
+                { "@value", value }
+            };
+
+            return this.database.Read(queryCommand, parameters);//this.database.QuickLookUp("ID", table, where, value);
         }
     }
 
@@ -108,8 +116,14 @@ namespace SessionTracker.Modules.Data.Database
 
         public override IEnumerable<NameValueCollection> Execute()
         {
-            return this.database.QuickLookUp("seq", "sqlite_sequence", "Name", table);
+            string queryCommand = "select seq from sqlite_sequence where Name = @table";
+            Dictionary<string, string> parameters = new Dictionary<string, string>()
+            {
+                { "@table", this.table }
+            };
+
+            return this.database.Read(queryCommand, parameters);//this.database.QuickLookUp("seq", "sqlite_sequence", "Name", table);
         }
     }
-   
+   */
 }

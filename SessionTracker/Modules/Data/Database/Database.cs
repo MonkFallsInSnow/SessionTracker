@@ -80,6 +80,52 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
+        //use this and make sure none of the literals in the commandText are supplied by the user via the UI
+        public IEnumerable<NameValueCollection> Read(string commandText, Dictionary<string, string> parameters = null)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(this.connection))
+            {
+                command.CommandText = commandText;
+
+                if (parameters != null)
+                {
+                    foreach (KeyValuePair<string, string> kvp in parameters)
+                    {
+                        command.Parameters.AddWithValue(kvp.Key, kvp.Value);
+                    }
+                }
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        yield return reader.GetValues();
+                }
+            }
+        }
+
+        public int Write(string commandText)
+        {
+            int rowsAffected = 0;
+
+            using(SQLiteTransaction transaction =  this.connection.BeginTransaction())
+            using(SQLiteCommand command = new SQLiteCommand(this.connection))
+            {
+                try
+                {
+                    command.CommandText = commandText;
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+                catch(Exception e)
+                {
+                    transaction.Rollback();
+                    throw new Exception(e.Message);
+                }
+
+                transaction.Commit();
+                return rowsAffected;
+            }
+        }
+
         public void Dispose()
         {
             if (this.connection != null)

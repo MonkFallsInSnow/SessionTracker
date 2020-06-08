@@ -1,9 +1,11 @@
 ﻿using SessionTracker.Modules.Data;
 using SessionTracker.Modules.Data.Database;
+using SessionTracker.Modules.Data.Database.Commands;
 using SessionTracker.Modules.Data.Models;
 using SessionTracker.Modules.Messaging;
 using SessionTracker.Modules.Requests;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Web;
@@ -43,15 +45,19 @@ namespace SessionTracker
         {
             BindingList<Campus> campuses = new BindingList<Campus>();
 
-            IDatabaseReadCommand command = new GetCampusesCommand(this.database);
-            DatabaseReader invoker = new DatabaseReader(command);
-            
-            foreach (var item in invoker.ExecuteCommand())
+            try
             {
-                campuses.Add(new Campus(Convert.ToInt32(item["ID"]), item["Name"]));
-            }
+                foreach (var item in this.database.Read(DbCommandResource.SelectCampuses))
+                {
+                    campuses.Add(new Campus(Convert.ToInt32(item["ID"]), item["Name"]));
+                }
 
-            return campuses;
+                return campuses;
+            }
+            catch (Exception)
+            {
+                return default;
+            }
         }
 
         private void loginBtn_Click(object sender, EventArgs e)
@@ -68,8 +74,9 @@ namespace SessionTracker
                 this.DialogResult = DialogResult.OK;
                 this.ActiveCookie = response;
                 this.ActiveCampus = ((Campus)campusComboBox.Items[campusComboBox.SelectedIndex]);
-            }
-            
+            } 
         }
+
+        
     }
 }

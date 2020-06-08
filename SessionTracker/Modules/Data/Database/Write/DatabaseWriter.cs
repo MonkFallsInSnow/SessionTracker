@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SessionTracker.Modules.Data.Database
 {
+    /*
     class DatabaseWriter : IInvoker<IDatabaseWriteCommand, int>
     {
         public IDatabaseWriteCommand Command { get; set; }
@@ -32,4 +33,5 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
     }
+    */
 }

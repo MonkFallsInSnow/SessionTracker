@@ -9,11 +9,13 @@ namespace SessionTracker.Modules.Data
     public interface IDatabase : IDisposable
     {
         SQLiteConnection Connection { get; }
-        IEnumerable<NameValueCollection> QuickLookUp(string columns, string table);
-        IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereExpression);
-        IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereColumn, string value);
-        IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName);
-        IEnumerable<NameValueCollection> SelectTopicsByCourse(string courseName);
-        int InsertSession(NameValueCollection session);
+        IEnumerable<NameValueCollection> Read(string commandText, Dictionary<string, string> parameters = null);
+        int Write(string commandText);
+        //IEnumerable<NameValueCollection> QuickLookUp(string columns, string table);
+        //IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereExpression);
+        //IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereColumn, string value);
+        //IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName);
+        //IEnumerable<NameValueCollection> SelectTopicsByCourse(string courseName);
+        //int InsertSession(NameValueCollection session);
     }
 }

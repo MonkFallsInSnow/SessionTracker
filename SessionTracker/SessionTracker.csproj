@@ -76,6 +76,10 @@
     <Compile Include="LoginDialog.Designer.cs">
       <DependentUpon>LoginDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Data\Database\Commands\DbCommandResource.cs" />
+    <Compile Include="Modules\Data\Database\Commands\MainFormDatabaseCommands.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Modules\Data\Database\DatabaseInsert.cs" />
     <Compile Include="Modules\Data\Database\DatabaseSelect.cs" />
     <Compile Include="Modules\Data\Database\Read\ReadCommands.cs" />

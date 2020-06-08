@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 
 namespace SessionTracker.Modules.Data.Database
 {
+    /*
     class DatabaseReader : IInvoker<IDatabaseReadCommand, IEnumerable<NameValueCollection>>
     {
         public IDatabaseReadCommand Command { get; set; }
@@ -21,4 +22,5 @@ namespace SessionTracker.Modules.Data.Database
             return this.Command.Execute();
         }
     }
+    */
 }

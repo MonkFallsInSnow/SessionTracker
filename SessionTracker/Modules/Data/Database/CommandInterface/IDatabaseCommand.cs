@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 
 namespace SessionTracker.Modules.Data.Database
 {
+    /*
     public interface IDatabaseCommand<T>
     {
         T Execute();
@@ -15,4 +16,5 @@ namespace SessionTracker.Modules.Data.Database
     public interface IDatabaseWriteCommand : IDatabaseCommand<int>
     {
     }
+    */
 }

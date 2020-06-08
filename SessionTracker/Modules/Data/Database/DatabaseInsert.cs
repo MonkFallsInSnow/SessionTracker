@@ -10,6 +10,7 @@ namespace SessionTracker.Modules.Data.Database
 {
     partial class Database
     {
+        /*
         public int InsertSession(NameValueCollection session)
         {
             try
@@ -83,7 +84,8 @@ namespace SessionTracker.Modules.Data.Database
         {
             int rowCount = 0;
             StringBuilder sb = new StringBuilder();
-            var result = this.QuickLookUp("StudentID", "Student").FirstOrDefault();
+            string queryCommand = "select StudentID from Student";
+            var result = this.Read(queryCommand);//this.QuickLookUp("StudentID", "Student").FirstOrDefault();
 
             if (result == null)
             {
@@ -99,5 +101,6 @@ namespace SessionTracker.Modules.Data.Database
 
             return rowCount;
         }
+        */
     }
 }

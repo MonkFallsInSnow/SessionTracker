@@ -1,5 +1,6 @@
 ﻿using SessionTracker.Modules.Data;
 using SessionTracker.Modules.Data.Database;
+using SessionTracker.Modules.Data.Database.Commands;
 using SessionTracker.Modules.Data.Models;
 using SessionTracker.Modules.Messaging;
 using SessionTracker.Modules.Requests;
@@ -20,12 +21,12 @@ namespace SessionTracker
 
         private readonly string activeCookie;
         private readonly Campus activeCampus;
-        private readonly IDatabase database;
+        public readonly IDatabase database;
         private readonly IMessageHandler messageHandler;
         private Timer eventTimer;
 
-        private DatabaseReader dataReader;
-        private DatabaseWriter dataWriter;
+        //private DatabaseReader dataReader;
+        //private DatabaseWriter dataWriter;
 
         private bool canUpdate = true;
         private IList<SignInData> signInDataBuffer;
@@ -39,8 +40,8 @@ namespace SessionTracker
             this.activeCampus = campus;
             this.database = database;
             this.messageHandler = messageHandler;
-            this.dataReader = new DatabaseReader();
-            this.dataWriter = new DatabaseWriter();
+            //this.dataReader = new DatabaseReader();
+            //this.dataWriter = new DatabaseWriter();
             this.signInDataBuffer = new BindingList<SignInData>();
             this.loggedSessionCache = new HashSet<SignInData>();
             
@@ -67,10 +68,10 @@ namespace SessionTracker
             tutorSelectorColumn.DisplayMember = "FullName";
             tutorSelectorColumn.ValueMember = "ID";
 
-            this.dataReader.Command = new GetTutorsByCampusCommand(this.database, this.activeCampus.Name);
+            //this.dataReader.Command = new GetTutorsByCampusCommand(this.database, this.activeCampus.Name);
             BindingList<Tutor> tutors = new BindingList<Tutor>();
 
-            foreach (NameValueCollection item in this.dataReader.ExecuteCommand())
+            foreach (NameValueCollection item in this.GetTutorsByCampus(this.activeCampus.Name))
             {
                 tutors.Add(
                     new Tutor(
@@ -130,14 +131,15 @@ namespace SessionTracker
             return requestHandler.MakeRequest(LogDataURL, payload);
         }
 
-        private NameValueCollection CreateSession(SignInData data, DataGridViewCellCollection cells)
+        private NameValueCollection CollectSessionData(SignInData data, DataGridViewCellCollection cells)
         {
-            this.dataReader.Command = new GetLastInsertedRowIDCommand(this.database, "Session");
+            //this.dataReader.Command = new GetLastInsertedRowIDCommand(this.database, "Session");
             NameValueCollection sessionData = new NameValueCollection();
 
-            var id = this.dataReader.ExecuteCommand().FirstOrDefault();
-            string sessionID = id == null ? "0" : (Convert.ToInt32(id[0]) + 1).ToString();
+            //var id = this.dataReader.ExecuteCommand().FirstOrDefault();
+            //string sessionID = id == null ? "0" : (Convert.ToInt32(id[0]) + 1).ToString();
 
+            string sessionID = this.GetLastSessionID();
             sessionData.Add("ID", sessionID);
             sessionData.Add("StudentID", data.StudentID);
             sessionData.Add("Timestamp", data.Timestamp.ToString());
@@ -146,17 +148,20 @@ namespace SessionTracker
             sessionData.Add("Notes", cells["Notes"].Value.ToString());
             sessionData.Add("IsWorkshop", Convert.ToBoolean(cells["IsWorkshop"].Value).ToString());
 
-            
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Campus", "Name", cells["Campus"].Value.ToString());
-            string campusID = this.dataReader.ExecuteCommand().First()[0];
+
+            //this.dataReader.Command = new GetReferenceIDCommand(this.database, "Campus", "Name", cells["Campus"].Value.ToString());
+            //string campusID = this.dataReader.ExecuteCommand().First()[0];
+            string campusID = this.GetCampusID(cells["Campus"].Value.ToString());
             sessionData.Add("CampusID", campusID);
 
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", "Name", cells["Course"].Value.ToString());
-            string courseID = this.dataReader.ExecuteCommand().First()[0];
+            // this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", "Name", cells["Course"].Value.ToString());
+            //string courseID = this.dataReader.ExecuteCommand().First()[0];
+            string courseID = this.GetCourseID(cells["Course"].Value.ToString());
             sessionData.Add("CourseID", courseID);
 
-            this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", "Name", cells["Center"].Value.ToString());
-            string centerID = this.dataReader.ExecuteCommand().First()[0];
+            //this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", "Name", cells["Center"].Value.ToString());
+            //string centerID = this.dataReader.ExecuteCommand().First()[0];
+            string centerID = this.GetCenterID(cells["center"].Value.ToString());
             sessionData.Add("CenterID", centerID);
 
             sessionData.Add("TutorID", cells["Tutor"].Value.ToString());
@@ -233,14 +238,15 @@ namespace SessionTracker
             {
                 SignInData data = (SignInData)senderGrid.CurrentRow.DataBoundItem;
                 DataGridViewCellCollection cells = senderGrid.CurrentRow.Cells;
-                NameValueCollection session = CreateSession(data, cells);
+                NameValueCollection sessionData = CollectSessionData(data, cells);
 
-                this.dataWriter.Command = new LogSessionCommand(this.database, session);
+                //this.dataWriter.Command = new LogSessionCommand(this.database, sessionData);
 
                 try
                 {
-                    int rowsInserted = this.dataWriter.ExecuteCommand();
-                    
+                    //int rowsInserted = this.dataWriter.ExecuteCommand();
+                    int rowsInserted = this.LogSession(sessionData);
+
                     if(rowsInserted == 0)
                     {
                         this.messageHandler.ShowDialog("Logging Error", "Failed to log session. Please try again.", MessageBoxIcon.Error);
@@ -274,13 +280,12 @@ namespace SessionTracker
 
             if (senderGrid.Columns[e.ColumnIndex].Name == "Topics" && e.RowIndex >= 0 && senderGrid.Columns[e.ColumnIndex] is DataGridViewTextBoxColumn)
             {
-                //TODO: add error handing
                 string courseName = senderGrid.CurrentRow.Cells["Course"].Value.ToString();
 
-                this.dataReader.Command = new GetTopicsByCourseCommand(this.database, courseName);
+                //this.dataReader.Command = new GetTopicsByCourseCommand(this.database, courseName);
                 BindingList<Topic> topics = new BindingList<Topic>();
 
-                foreach (var item in this.dataReader.ExecuteCommand())
+                foreach (var item in this.GetTopicsByCourse(courseName))
                 {
                     topics.Add(
                         new Topic(

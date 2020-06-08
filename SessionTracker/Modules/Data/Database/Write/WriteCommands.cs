@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SessionTracker.Modules.Data.Database
 {
+    /*
     abstract class BaseWriteCommand : IDatabaseWriteCommand
     {
         protected readonly IDatabase database;
@@ -63,4 +64,5 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
     }
+    */
 }
