@@ -103,7 +103,7 @@ namespace SessionTracker.Modules.Data.Database
             }
         }
 
-        public int Write(string commandText)
+        public int Write(string commandText, Dictionary<string, string> parameters = null)
         {
             int rowsAffected = 0;
 
@@ -113,6 +113,15 @@ namespace SessionTracker.Modules.Data.Database
                 try
                 {
                     command.CommandText = commandText;
+
+                    if (parameters != null)
+                    {
+                        foreach (KeyValuePair<string, string> kvp in parameters)
+                        {
+                            command.Parameters.AddWithValue(kvp.Key, kvp.Value);
+                        }
+                    }
+
                     rowsAffected = command.ExecuteNonQuery();
                 }
                 catch(Exception e)

@@ -15,6 +15,7 @@ namespace SessionTracker.Modules.Data.Database.Commands
         internal static readonly string IdParameterKey = "@id";
         internal static readonly string FirstNameParameterKey = "@fname";
         internal static readonly string LastNameParameterKey = "@lname";
+        internal static readonly string NameParameterKey = "@name";
 
         internal static readonly string SelectTutorsByCampus = "" +
             "select t.ID, t.FName, t.LName, t.IsActive " +
@@ -40,9 +41,8 @@ namespace SessionTracker.Modules.Data.Database.Commands
         internal static readonly string SelectCampus = "select * from Campus where Name = " + CampusParameterKey;
         internal static readonly string SelectCourse = "select * from Course where Name = " + CourseParameterKey;
         internal static readonly string SelectCenter = "select * from Center where Name = " + CenterParameterKey;
+        internal static readonly string SelectTopics = "select * from Topic where Name = " + NameParameterKey;
         internal static readonly string SelectStudentByID = "select * from Student where ID = " + IdParameterKey;
         internal static readonly string SelectCampuses = "select ID, Name from Campus";
-
-
     }
 }

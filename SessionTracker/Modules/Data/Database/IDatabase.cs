@@ -10,12 +10,7 @@ namespace SessionTracker.Modules.Data
     {
         SQLiteConnection Connection { get; }
         IEnumerable<NameValueCollection> Read(string commandText, Dictionary<string, string> parameters = null);
-        int Write(string commandText);
-        //IEnumerable<NameValueCollection> QuickLookUp(string columns, string table);
-        //IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereExpression);
-        //IEnumerable<NameValueCollection> QuickLookUp(string columns, string table, string whereColumn, string value);
-        //IEnumerable<NameValueCollection> SelectTutorsByCampus(string campusName);
-        //IEnumerable<NameValueCollection> SelectTopicsByCourse(string courseName);
-        //int InsertSession(NameValueCollection session);
+        int Write(string commandText, Dictionary<string, string> parameters = null);
+
     }
 }

@@ -11,9 +11,9 @@ namespace SessionTracker.Modules.Requests
     public struct DataRequestPayload
     {
         public readonly string Cookie;
-        public readonly Campus Campus;
+        public readonly IDNamePair Campus;
 
-        public DataRequestPayload(string cookie, Campus campus)
+        public DataRequestPayload(string cookie, IDNamePair campus)
         {
             this.Cookie = cookie;
             this.Campus = campus;
@@ -89,7 +89,7 @@ namespace SessionTracker.Modules.Requests
             return logData;
         }
 
-        private SignInData BuildDataRow(JToken element, Campus campus)
+        private SignInData BuildDataRow(JToken element, IDNamePair campus)
         {
             const string WORK_INDEPENDENT = "Wrk-Independent";
 

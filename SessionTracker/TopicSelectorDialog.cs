@@ -18,23 +18,23 @@ namespace SessionTracker
         private const int CONTROL_WIDTH_EXPANDED = 740;
         private const int CONTROL_HEIGHT = 580;
 
-        public IList<Topic> SelectedTopics { get; private set; }
+        public IList<IDNamePair> SelectedTopics { get; private set; }
 
-        public TopicSelectorDialog(BindingList<Topic> topics)
+        public TopicSelectorDialog(BindingList<IDNamePair> topics)
         {
             InitializeComponent();
             this.Height = CONTROL_HEIGHT;
 
-            this.SelectedTopics = new List<Topic>();
+            this.SelectedTopics = new List<IDNamePair>();
             BindingSource source = new BindingSource(topics, null);
             topicsCheckedListBox.DataSource = source;
         }
 
         private void topicsSaveBtn_Click(object sender, EventArgs e)
         {
-            foreach(Topic item in topicsCheckedListBox.CheckedItems)
+            foreach(IDNamePair item in topicsCheckedListBox.CheckedItems)
             {
-                this.SelectedTopics.Add(new Topic(item.ID, item.Name));
+                this.SelectedTopics.Add(new IDNamePair(item.ID, item.Name));
             }
         }
 

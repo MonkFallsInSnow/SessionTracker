@@ -20,19 +20,16 @@ namespace SessionTracker
         private static readonly int DataRequestInterval = 30000;
 
         private readonly string activeCookie;
-        private readonly Campus activeCampus;
+        private readonly IDNamePair activeCampus;
         public readonly IDatabase database;
         private readonly IMessageHandler messageHandler;
         private Timer eventTimer;
-
-        //private DatabaseReader dataReader;
-        //private DatabaseWriter dataWriter;
 
         private bool canUpdate = true;
         private IList<SignInData> signInDataBuffer;
         private HashSet<SignInData> loggedSessionCache;
 
-        public SessionTrackerMainForm(IDatabase database, IMessageHandler messageHandler, string cookie, Campus campus)
+        public SessionTrackerMainForm(IDatabase database, IMessageHandler messageHandler, string cookie, IDNamePair campus)
         {
             InitializeComponent();
 
@@ -40,8 +37,7 @@ namespace SessionTracker
             this.activeCampus = campus;
             this.database = database;
             this.messageHandler = messageHandler;
-            //this.dataReader = new DatabaseReader();
-            //this.dataWriter = new DatabaseWriter();
+
             this.signInDataBuffer = new BindingList<SignInData>();
             this.loggedSessionCache = new HashSet<SignInData>();
             
@@ -68,7 +64,6 @@ namespace SessionTracker
             tutorSelectorColumn.DisplayMember = "FullName";
             tutorSelectorColumn.ValueMember = "ID";
 
-            //this.dataReader.Command = new GetTutorsByCampusCommand(this.database, this.activeCampus.Name);
             BindingList<Tutor> tutors = new BindingList<Tutor>();
 
             foreach (NameValueCollection item in this.GetTutorsByCampus(this.activeCampus.Name))
@@ -131,43 +126,86 @@ namespace SessionTracker
             return requestHandler.MakeRequest(LogDataURL, payload);
         }
 
-        private NameValueCollection CollectSessionData(SignInData data, DataGridViewCellCollection cells)
+        //private NameValueCollection CollectSessionData(SignInData data, DataGridViewCellCollection cells)
+        //{
+        //    NameValueCollection sessionData = new NameValueCollection();
+
+        //    string sessionID = this.GetLastSessionID();
+        //    sessionData.Add("ID", sessionID);
+        //    sessionData.Add("StudentID", data.StudentID);
+        //    sessionData.Add("Timestamp", data.Timestamp.ToString());
+        //    sessionData.Add("FName", data.FName);
+        //    sessionData.Add("LName", data.LName);
+        //    sessionData.Add("Notes", cells["Notes"].Value.ToString());
+        //    sessionData.Add("IsWorkshop", Convert.ToBoolean(cells["IsWorkshop"].Value).ToString());
+
+        //    string campusID = this.GetCampusID(cells["Campus"].Value.ToString());
+        //    sessionData.Add("CampusID", campusID);
+
+        //    string courseID = this.GetCourseID(cells["Course"].Value.ToString());
+        //    sessionData.Add("CourseID", courseID);
+
+        //    string centerID = this.GetCenterID(cells["center"].Value.ToString());
+        //    sessionData.Add("CenterID", centerID);
+
+        //    sessionData.Add("TutorID", cells["Tutor"].Value.ToString());
+        //    sessionData.Add("Topics", cells["Topics"].Value.ToString());
+
+        //    return sessionData;
+        //}
+
+        private Session CollectSessionData(SignInData data, DataGridViewCellCollection cells)
         {
-            //this.dataReader.Command = new GetLastInsertedRowIDCommand(this.database, "Session");
-            NameValueCollection sessionData = new NameValueCollection();
+            Session sessionData = new Session(this.GetLastSessionID());
 
-            //var id = this.dataReader.ExecuteCommand().FirstOrDefault();
-            //string sessionID = id == null ? "0" : (Convert.ToInt32(id[0]) + 1).ToString();
+            sessionData.StudentID = data.StudentID;
+            sessionData.Timestamp = data.Timestamp;
+            sessionData.FName = data.FName;
+            sessionData.LName = data.LName;
+            sessionData.Notes = cells["Notes"].Value.ToString();
+            sessionData.IsWorkshop = Convert.ToBoolean(cells["IsWorkshop"].Value);
 
-            string sessionID = this.GetLastSessionID();
-            sessionData.Add("ID", sessionID);
-            sessionData.Add("StudentID", data.StudentID);
-            sessionData.Add("Timestamp", data.Timestamp.ToString());
-            sessionData.Add("FName", data.FName);
-            sessionData.Add("LName", data.LName);
-            sessionData.Add("Notes", cells["Notes"].Value.ToString());
-            sessionData.Add("IsWorkshop", Convert.ToBoolean(cells["IsWorkshop"].Value).ToString());
+            //sessionData.Campus = this.GetCampusID(cells["Campus"].Value.ToString());
+            //sessionData.Add("CampusID", campusID);
+            sessionData.Campus = (IDNamePair)cells["Campus"].Value;
 
+            //string courseID = this.GetCourseID(cells["Course"].Value.ToString());
+            //sessionData.Add("CourseID", courseID);
+            sessionData.Course = (IDNamePair)cells["Course"].Value;
 
-            //this.dataReader.Command = new GetReferenceIDCommand(this.database, "Campus", "Name", cells["Campus"].Value.ToString());
-            //string campusID = this.dataReader.ExecuteCommand().First()[0];
-            string campusID = this.GetCampusID(cells["Campus"].Value.ToString());
-            sessionData.Add("CampusID", campusID);
+            //string centerID = this.GetCenterID(cells["center"].Value.ToString());
+            //sessionData.Add("CenterID", centerID);
+            sessionData.Center = (IDNamePair)cells["Center"].Value;
 
-            // this.dataReader.Command = new GetReferenceIDCommand(this.database, "Course", "Name", cells["Course"].Value.ToString());
-            //string courseID = this.dataReader.ExecuteCommand().First()[0];
-            string courseID = this.GetCourseID(cells["Course"].Value.ToString());
-            sessionData.Add("CourseID", courseID);
+            //sessionData.Add("TutorID", cells["Tutor"].Value.ToString());
+            //sessionData.Add("Topics", cells["Topics"].Value.ToString());
+            sessionData.Tutor = (Tutor)cells["Tutor"].Value;
+            sessionData.Topics = this.ParseTopicsString(cells["Topics"].Value.ToString().Split(','));
 
-            //this.dataReader.Command = new GetReferenceIDCommand(this.database, "Center", "Name", cells["Center"].Value.ToString());
-            //string centerID = this.dataReader.ExecuteCommand().First()[0];
-            string centerID = this.GetCenterID(cells["center"].Value.ToString());
-            sessionData.Add("CenterID", centerID);
-
-            sessionData.Add("TutorID", cells["Tutor"].Value.ToString());
-            sessionData.Add("Topics", cells["Topics"].Value.ToString());
-            
             return sessionData;
+        }
+
+        private List<IDNamePair> ParseTopicsString(params string[] topics)
+        {
+            List<IDNamePair> result = new List<IDNamePair>();
+
+            foreach (var name in topics)
+            {
+                NameValueCollection queryResult = this.database.Read(
+                    DbCommandResource.SelectTopics,
+                    new Dictionary<string, string>()
+                    {
+                        { DbCommandResource.NameParameterKey, name }
+                    })
+                    .FirstOrDefault();
+
+                if(queryResult != null)
+                {
+                    result.Add(new IDNamePair(queryResult["ID"], queryResult["Name"]));
+                }
+            }
+
+            return result;
         }
 
         private void UpdateSignInData(Object obj, EventArgs e)
@@ -238,14 +276,12 @@ namespace SessionTracker
             {
                 SignInData data = (SignInData)senderGrid.CurrentRow.DataBoundItem;
                 DataGridViewCellCollection cells = senderGrid.CurrentRow.Cells;
-                NameValueCollection sessionData = CollectSessionData(data, cells);
-
-                //this.dataWriter.Command = new LogSessionCommand(this.database, sessionData);
+                //NameValueCollection sessionData = CollectSessionData(data, cells);
+                Session session = CollectSessionData(data, cells);
 
                 try
                 {
-                    //int rowsInserted = this.dataWriter.ExecuteCommand();
-                    int rowsInserted = this.LogSession(sessionData);
+                    int rowsInserted = this.LogSession(session);
 
                     if(rowsInserted == 0)
                     {
@@ -282,14 +318,13 @@ namespace SessionTracker
             {
                 string courseName = senderGrid.CurrentRow.Cells["Course"].Value.ToString();
 
-                //this.dataReader.Command = new GetTopicsByCourseCommand(this.database, courseName);
-                BindingList<Topic> topics = new BindingList<Topic>();
+                BindingList<IDNamePair> topics = new BindingList<IDNamePair>();
 
                 foreach (var item in this.GetTopicsByCourse(courseName))
                 {
                     topics.Add(
-                        new Topic(
-                            Convert.ToInt32(item["ID"]),
+                        new IDNamePair(
+                            item["ID"],
                             item["Name"]
                         )
                     );
@@ -303,7 +338,7 @@ namespace SessionTracker
                     {
                         string topicsDisplay = "";
 
-                        foreach (Topic topic in topicSelectorDialog.SelectedTopics)
+                        foreach (IDNamePair topic in topicSelectorDialog.SelectedTopics)
                         {
                             topicsDisplay += $"{topic.ToString()}, ";
                         }
@@ -321,6 +356,148 @@ namespace SessionTracker
                     senderGrid.Refresh();
 
                 }
+            }
+        }
+
+        private IEnumerable<NameValueCollection> GetTutorsByCampus(string campus)
+        {
+            try
+            {
+                return this.database.Read(
+                    DbCommandResource.SelectTutorsByCampus,
+                    new Dictionary<string, string>()
+                    {
+                    { DbCommandResource.CampusParameterKey, campus }
+                    });
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+        }
+
+        private string GetLastSessionID()
+        {
+            try
+            {
+                var id = this.database.Read(
+                    DbCommandResource.SelectLastRowID,
+                    new Dictionary<string, string>()
+                    {
+                    { DbCommandResource.TableParameterKey, "Session" }
+                    })
+                    .FirstOrDefault();
+
+                return id == null ? "0" : (Convert.ToInt32(id[0]) + 1).ToString();
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+        }
+
+        private string GetCampusID(string campus)
+        {
+            try
+            {
+                return this.database.Read(
+                    DbCommandResource.SelectCampus,
+                    new Dictionary<string, string>()
+                    {
+                    { DbCommandResource.CampusParameterKey, campus }
+                    })
+                    .First()[0]
+                    .ToString();
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+        }
+
+        private string GetCourseID(string course)
+        {
+            try
+            {
+                return this.database.Read(
+                    DbCommandResource.SelectCourse,
+                    new Dictionary<string, string>()
+                    {
+                    { DbCommandResource.CourseParameterKey, course }
+                    })
+                    .First()[0]
+                    .ToString();
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+        }
+
+        private string GetCenterID(string center)
+        {
+            try
+            {
+                return this.database.Read(
+                    DbCommandResource.SelectCenter,
+                    new Dictionary<string, string>()
+                    {
+                    { DbCommandResource.CenterParameterKey, center }
+                    })
+                    .First()[0]
+                    .ToString();
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+        }
+
+        private int LogSession(Session session)
+        {
+            int rowCount = 0;
+
+            try
+            {
+                string studentID = this.database.Read(
+                    DbCommandResource.SelectStudentByID,
+                    new Dictionary<string, string>()
+                    {
+                        { DbCommandResource.IdParameterKey, session.ID }
+                    })
+                    .FirstOrDefault()[0];
+
+                if (String.IsNullOrEmpty(studentID))
+                {
+                    //add student
+                }
+
+
+                //add session data to Session table
+                //add session topic data to SessionTopic table
+
+                return rowCount;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        private IEnumerable<NameValueCollection> GetTopicsByCourse(string course)
+        {
+            try
+            {
+                return this.database.Read(
+                    DbCommandResource.SelectTopicsByCourse,
+                    new Dictionary<string, string>()
+                    {
+                    { DbCommandResource.CourseParameterKey, course }
+                    });
+            }
+            catch (Exception)
+            {
+                return default;
             }
         }
     }

@@ -25,7 +25,7 @@ namespace SessionTracker
         private IMessageHandler messageHandler;
 
         public string ActiveCookie { get; private set; }
-        public Campus ActiveCampus { get; private set; }
+        public IDNamePair ActiveCampus { get; private set; }
 
         public LoginDialog(IRequestHandler<string, NameValueCollection> requestHandler, IDatabase database, IMessageHandler messageHandler)
         {
@@ -41,15 +41,15 @@ namespace SessionTracker
             campusComboBox.DataSource = source;
         }
 
-        private BindingList<Campus> GetCampuses()
+        private BindingList<IDNamePair> GetCampuses()
         {
-            BindingList<Campus> campuses = new BindingList<Campus>();
+            BindingList<IDNamePair> campuses = new BindingList<IDNamePair>();
 
             try
             {
                 foreach (var item in this.database.Read(DbCommandResource.SelectCampuses))
                 {
-                    campuses.Add(new Campus(Convert.ToInt32(item["ID"]), item["Name"]));
+                    campuses.Add(new IDNamePair(item["ID"], item["Name"]));
                 }
 
                 return campuses;
@@ -73,7 +73,7 @@ namespace SessionTracker
             {
                 this.DialogResult = DialogResult.OK;
                 this.ActiveCookie = response;
-                this.ActiveCampus = ((Campus)campusComboBox.Items[campusComboBox.SelectedIndex]);
+                this.ActiveCampus = ((IDNamePair)campusComboBox.Items[campusComboBox.SelectedIndex]);
             } 
         }
 

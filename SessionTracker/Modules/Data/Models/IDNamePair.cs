@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace SessionTracker.Modules.Data.Models
 {
-    public class Topic
+    public class IDNamePair
     {
-        public int ID { get; set; }
-        public string Name { get; set; }
+        public string ID { get; private set; }
+        public string Name { get; private set; }
 
-        public Topic(int id, string name)
+        public IDNamePair(string id, string name)
         {
             this.ID = id;
             this.Name = name;
@@ -19,7 +19,7 @@ namespace SessionTracker.Modules.Data.Models
 
         public override string ToString()
         {
-            return $"{this.Name}";
+            return this.Name;
         }
     }
 }
